@@ -60,6 +60,36 @@ def best_match(product_name, features, products, min_match=2):
         return None
     return best
 
+def get_available_colors(product_url):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (compatible; YasinrayanScraper/1.0)"
+    }
+    try:
+        resp = requests.get(product_url, headers=headers, timeout=15)
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        color_divs = soup.select('div.wd-swatches-product .wd-swatch-text')
+        colors = [div.get_text(strip=True) for div in color_divs]
+        return colors
+    except Exception as e:
+        print(f"[DEBUG] Error fetching colors from {product_url}: {e}")
+        return []
+
+def map_color_name(color):
+    color_map = {
+        'platinum': 'پلاتینی',
+        'graphite': 'مشکی',
+        'black': 'مشکی',
+        'sapphire': 'آبی (Sapphire)',
+        'gold': 'شنی طلایی',
+        # Add more mappings as needed
+    }
+    color_norm = normalize(color)
+    for en, fa in color_map.items():
+        if color_norm == normalize(en) or color_norm == normalize(fa):
+            return fa
+    return color  # fallback to original
+
 # --- Main script ---
 
 df = pd.read_excel('SampleSites.xlsx')
@@ -73,16 +103,23 @@ df['yasinrayanproducturl'] = df['yasinrayanproducturl'].astype('object')
 
 for idx, row in df.iterrows():
     product_name = row['Product name']
-    # Remove 'Color' from features for yasinrayan.com
     features = [row['Cpu'], row['Ram'], row['SSD']]
-    print(f"Processing row {idx+1} for yasinrayan.com: {product_name}, features: {features}")
+    desired_color = str(row['Color']).strip()
+    desired_color_mapped = map_color_name(desired_color)
+    print(f"Processing row {idx+1} for yasinrayan.com: {product_name}, features: {features}, color: {desired_color} (mapped: {desired_color_mapped})")
     products = search_yasinrayan_url(product_name, features)
     match = best_match(product_name, features, products)
     if match:
-        print(f"  [DEBUG] Matched product: {match['title']} ({match['url']})")
-        price = match['cat_price']
-        print(f"  [DEBUG] Category page price used: {price}")
-        df.at[idx, 'yasinrayanproducturl'] = match['url']
+        available_colors = get_available_colors(match['url'])
+        print(f"  [DEBUG] Available colors: {available_colors}")
+        if any(normalize(desired_color_mapped) == normalize(c) for c in available_colors):
+            print(f"  [DEBUG] Color match found: {desired_color_mapped}")
+            price = match['cat_price']
+            df.at[idx, 'yasinrayanproducturl'] = match['url']
+        else:
+            print(f"  [DEBUG] Desired color '{desired_color}' (mapped: '{desired_color_mapped}') not found in available colors.")
+            price = ''
+            df.at[idx, 'yasinrayanproducturl'] = ''
     else:
         print("  [DEBUG] No matching product found.")
         price = ''

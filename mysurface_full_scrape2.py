@@ -17,7 +17,6 @@ def normalize(text):
     return re.sub(r'[^a-zA-Z0-9آ-ی]', '', text)
 
 def best_match(product_name, features, products, min_match=2):
-    # Combine product name and features for more robust matching
     search_terms = [normalize(product_name)] + [normalize(f) for f in features if f]
     print(f"    [DEBUG] Normalized search terms: {search_terms}")
     print(f"    [DEBUG] Original features: {features}")
@@ -41,9 +40,9 @@ def best_match(product_name, features, products, min_match=2):
         print(f"      - {prod['name']}")
     return None
 
-def scrape_all_products_from_micropple(url):
+def scrape_all_products_from_mysurface(url):
     headers = {
-        "User-Agent": "Mozilla/5.0 (compatible; MicroppleScraper/1.0)"
+        "User-Agent": "Mozilla/5.0 (compatible; MysurfaceScraper/1.0)"
     }
     products = []
     page = 1
@@ -57,19 +56,25 @@ def scrape_all_products_from_micropple(url):
             print(f"[DEBUG] Error scraping {page_url}: {e}")
             break
         soup = BeautifulSoup(resp.text, 'html.parser')
-        product_divs = soup.find_all('div', class_='product-grid-item')
+        product_divs = soup.find_all('div', class_='product-small')
         if not product_divs:
             break
         for prod_div in product_divs:
             # Name
-            name_tag = prod_div.find('h3', class_='wd-entities-title')
+            name_tag = prod_div.find('p', class_='name')
             name = name_tag.get_text(strip=True) if name_tag else ''
             # URL
-            a_tag = prod_div.find('a', class_='product-image-link', href=True)
+            a_tag = prod_div.find('a', class_='woocommerce-LoopProduct-link', href=True)
             url_full = a_tag['href'] if a_tag else ''
-            # Price
-            price_tag = prod_div.find('span', class_='woocommerce-Price-amount')
-            price = price_tag.get_text(strip=True) if price_tag else ''
+            # Price (prefer <ins> if present, else <del> or just <span class='woocommerce-Price-amount'>)
+            price = ''
+            price_tag = prod_div.find('ins')
+            if price_tag:
+                price_amt = price_tag.find('span', class_='woocommerce-Price-amount')
+                price = price_amt.get_text(strip=True) if price_amt else ''
+            if not price:
+                price_tag = prod_div.find('span', class_='woocommerce-Price-amount')
+                price = price_tag.get_text(strip=True) if price_tag else ''
             products.append({'name': name, 'price': price, 'url': url_full})
         # Pagination: look for next page
         next_page = soup.find('a', class_='next')
@@ -81,9 +86,9 @@ def scrape_all_products_from_micropple(url):
 
 # --- Main script ---
 
-CATEGORY_URL = 'https://micropple.ir/product-category/microsoft/tablet-microsoft/'
+CATEGORY_URL = 'https://mysurface.ir/surface-pro/'
 
-all_products = scrape_all_products_from_micropple(CATEGORY_URL)
+all_products = scrape_all_products_from_mysurface(CATEGORY_URL)
 
 print("[ALL SCRAPED PRODUCTS]")
 for prod in all_products:
@@ -94,30 +99,30 @@ for prod in all_products:
 # Load Excel and match
 
 df = pd.read_excel('SampleSites.xlsx')
-if 'micropple.ir' not in df.columns:
-    df['micropple.ir'] = ''
-df['micropple.ir'] = df['micropple.ir'].astype('object')
-if 'microppleproducturl' not in df.columns:
-    idx = list(df.columns).index('micropple.ir') + 1
-    df.insert(idx, 'microppleproducturl', '')
-df['microppleproducturl'] = df['microppleproducturl'].astype('object')
+if 'mysurface.ir' not in df.columns:
+    df['mysurface.ir'] = ''
+df['mysurface.ir'] = df['mysurface.ir'].astype('object')
+if 'mysurfaceproducturl' not in df.columns:
+    idx = list(df.columns).index('mysurface.ir') + 1
+    df.insert(idx, 'mysurfaceproducturl', '')
+df['mysurfaceproducturl'] = df['mysurfaceproducturl'].astype('object')
 
 for idx, row in df.iterrows():
     product_name = row['Product name']
     features = [row['Cpu'], row['Ram'], row['SSD'], row['Color']]
-    print(f"Processing row {idx+1} for micropple.ir: {product_name}, features: {features}")
+    print(f"Processing row {idx+1} for mysurface.ir: {product_name}, features: {features}")
     match = best_match(product_name, features, all_products)
     if match:
         print(f"  [DEBUG] Matched product: {match['name']}")
         url = match['url']
         price = match['price']
-        df.at[idx, 'microppleproducturl'] = url
+        df.at[idx, 'mysurfaceproducturl'] = url
     else:
         print("  [DEBUG] No matching product found.")
         price = ''
-        df.at[idx, 'microppleproducturl'] = ''
+        df.at[idx, 'mysurfaceproducturl'] = ''
     print(f"  -> Price found: {price}")
-    df.at[idx, 'micropple.ir'] = price
+    df.at[idx, 'mysurface.ir'] = price
     time.sleep(1)
 
 df.to_excel('SampleSites.xlsx', index=False)
