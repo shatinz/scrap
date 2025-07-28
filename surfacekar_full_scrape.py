@@ -34,6 +34,10 @@ def search_surfacekar_url(product_name, features):
                         price = price_span.get_text(strip=True)
                         break
             if title and href:
+                # Remove 'تومان' and convert Persian digits to English
+                if price:
+                    price = price.replace('تومان', '').strip()
+                    price = persian_to_english_digits(price)
                 products.append({'title': title, 'url': href, 'cat_price': price})
         return products
     except Exception as e:
@@ -60,6 +64,13 @@ def best_match(product_name, features, products, min_match=2):
             print(f"      - {prod['title']}")
         return None
     return best
+
+def persian_to_english_digits(text):
+    persian_digits = '۰۱۲۳۴۵۶۷۸۹'
+    english_digits = '0123456789'
+    for p, e in zip(persian_digits, english_digits):
+        text = text.replace(p, e)
+    return text
 
 # --- Main script ---
 
@@ -93,4 +104,4 @@ for idx, row in df.iterrows():
     time.sleep(1)
 
 df.to_excel('SampleSites.xlsx', index=False)
-print('Done. Prices and product URLs updated in SampleSites.xlsx.') 
+print('Done. Prices and product URLs updated in SampleSites.xlsx.')

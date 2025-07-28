@@ -4,8 +4,11 @@ from bs4 import BeautifulSoup
 import time
 import urllib.parse
 import re
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.common.by import By
 
-#color is not a feature for yasinrayan.com
+#fully functioningggggggg 
 def search_yasinrayan_url(product_name, features):
     search_query = product_name + ' ' + ' '.join(str(f) for f in features if f)
     search_url = f'https://www.yasinrayan.com/?s={urllib.parse.quote(search_query)}&post_type=product'
@@ -68,11 +71,45 @@ def get_available_colors(product_url):
         resp = requests.get(product_url, headers=headers, timeout=15)
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, 'html.parser')
-        color_divs = soup.select('div.wd-swatches-product .wd-swatch-text')
-        colors = [div.get_text(strip=True) for div in color_divs]
+        color_divs = soup.select('div.wd-swatches-product .wd-swatch')
+        colors = []
+        for div in color_divs:
+            color_name = div.get('data-title') or div.get('title') or ''
+            if not color_name:
+                text_span = div.find('span', class_='wd-swatch-text')
+                if text_span:
+                    color_name = text_span.get_text(strip=True)
+            classes = div.get('class', [])
+            enabled = 'wd-enabled' in classes and 'wd-disabled' not in classes
+            colors.append((color_name.strip(), enabled))
         return colors
     except Exception as e:
         print(f"[DEBUG] Error fetching colors from {product_url}: {e}")
+        return []
+
+def get_available_colors_selenium(product_url):
+    """Extract all available colors and their enabled/disabled status using Selenium."""
+    try:
+        options = FirefoxOptions()
+        options.add_argument('--headless')
+        driver = webdriver.Firefox(options=options)
+        driver.get(product_url)
+        colors = []
+        # Wait for swatches to load (optional: add WebDriverWait for robustness)
+        swatches = driver.find_elements(By.CSS_SELECTOR, 'div.wd-swatches-product .wd-swatch')
+        for swatch in swatches:
+            color_name = swatch.get_attribute('data-title') or swatch.get_attribute('title') or ''
+            if not color_name:
+                text_spans = swatch.find_elements(By.CSS_SELECTOR, 'span.wd-swatch-text')
+                if text_spans:
+                    color_name = text_spans[0].text.strip()
+            classes = swatch.get_attribute('class').split()
+            enabled = 'wd-enabled' in classes and 'wd-disabled' not in classes
+            colors.append((color_name.strip(), enabled))
+        driver.quit()
+        return colors
+    except Exception as e:
+        print(f"[DEBUG] Error fetching colors from {product_url} with Selenium: {e}")
         return []
 
 def map_color_name(color):
@@ -110,14 +147,17 @@ for idx, row in df.iterrows():
     products = search_yasinrayan_url(product_name, features)
     match = best_match(product_name, features, products)
     if match:
-        available_colors = get_available_colors(match['url'])
+        available_colors = get_available_colors_selenium(match['url'])
         print(f"  [DEBUG] Available colors: {available_colors}")
-        if any(normalize(desired_color_mapped) == normalize(c) for c in available_colors):
-            print(f"  [DEBUG] Color match found: {desired_color_mapped}")
+        # Only match enabled colors
+        if any(normalize(desired_color_mapped) == normalize(c[0]) and c[1] for c in available_colors):
+            print(f"  [DEBUG] Color match found and enabled: {desired_color_mapped}")
             price = match['cat_price']
+            price = price.replace('تومان', '').strip()
+            price = persian_to_english_digits(price)
             df.at[idx, 'yasinrayanproducturl'] = match['url']
         else:
-            print(f"  [DEBUG] Desired color '{desired_color}' (mapped: '{desired_color_mapped}') not found in available colors.")
+            print(f"  [DEBUG] Desired color '{desired_color}' (mapped: '{desired_color_mapped}') not found or disabled.")
             price = ''
             df.at[idx, 'yasinrayanproducturl'] = ''
     else:
@@ -129,4 +169,4 @@ for idx, row in df.iterrows():
     time.sleep(1)
 
 df.to_excel('SampleSites.xlsx', index=False)
-print('Done. Prices and product URLs updated in SampleSites.xlsx.') 
+print('Done. Prices and product URLs updated in SampleSites.xlsx.')

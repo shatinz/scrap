@@ -16,30 +16,34 @@ def normalize(text):
     text = persian_to_english_digits(text)
     return re.sub(r'[^a-zA-Z0-9آ-ی]', '', text)
 
-def best_match(product_name, features, products, min_match=2):
-    # Combine product name and features for more robust matching
-    search_terms = [normalize(product_name)] + [normalize(f) for f in features if f]
-    print(f"    [DEBUG] Normalized search terms: {search_terms}")
-    print(f"    [DEBUG] Original features: {features}")
+def best_match(product_name, features, products):
+    # features: [Cpu, Ram, SSD, Color]
+    search_terms = [normalize(product_name)] + [normalize(f) for f in features[:3] if f]  # Cpu, Ram, SSD
+    color = normalize(features[3]) if len(features) > 3 and features[3] else None
+
+    print(f"    [DEBUG] Normalized search terms: {search_terms}, color: {color}")
     best = None
-    best_score = 0
     for prod in products:
         title = normalize(prod['name'])
-        print(f"    [DEBUG] Normalized product title: {title}")
-        print(f"    [DEBUG] Original product name: {prod['name']}")
-        score = sum(term in title for term in search_terms)
-        print(f"    [DEBUG] Match score: {score}")
-        if score > best_score:
-            best = prod
-            best_score = score
-    if best and best_score >= min_match:
-        print(f"    [DEBUG] MATCH FOUND (score={best_score}): {best['name']}")
-        return best
-    print(f"    [DEBUG] No strong match for search terms: {search_terms}")
-    print("    [DEBUG] Candidate product titles:")
-    for prod in products:
-        print(f"      - {prod['name']}")
-    return None
+        url = normalize(prod['url'])
+        # All features (except color) must be in title
+        if all(term in title for term in search_terms):
+            # Color must be in URL if specified
+            if color:
+                if color in url:
+                    best = prod
+                    print(f"    [DEBUG] MATCH FOUND (with color): {prod['name']}")
+                    break
+            else:
+                best = prod
+                print(f"    [DEBUG] MATCH FOUND (no color): {prod['name']}")
+                break
+    if not best:
+        print(f"    [DEBUG] No strong match for search terms: {search_terms} and color: {color}")
+        print("    [DEBUG] Candidate product titles:")
+        for prod in products:
+            print(f"      - {prod['name']}")
+    return best
 
 def scrape_all_products_from_micropple(url):
     headers = {
@@ -121,4 +125,4 @@ for idx, row in df.iterrows():
     time.sleep(1)
 
 df.to_excel('SampleSites.xlsx', index=False)
-print('Done. Prices and product URLs updated in SampleSites.xlsx.') 
+print('Done. Prices and product URLs updated in SampleSites.xlsx.')

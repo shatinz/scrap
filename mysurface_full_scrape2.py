@@ -16,29 +16,78 @@ def normalize(text):
     text = persian_to_english_digits(text)
     return re.sub(r'[^a-zA-Z0-9آ-ی]', '', text)
 
-def best_match(product_name, features, products, min_match=2):
-    search_terms = [normalize(product_name)] + [normalize(f) for f in features if f]
+# English to Persian color names
+EN_TO_FA_COLOR = {
+    "platinum": "پلاتینیوم",
+    "black": "مشکی",
+    "blue": "آبی",
+    "gold": "طلایی",
+    "silver": "نقره ای",
+    # Add more as needed
+}
+FA_TO_EN_COLOR = {v: k for k, v in EN_TO_FA_COLOR.items()}
+
+def get_persian_color_name(color):
+    return EN_TO_FA_COLOR.get(color.strip().lower(), color)
+
+def get_english_color_name(color):
+    return FA_TO_EN_COLOR.get(color.strip().lower(), color)
+
+def normalize_color(text):
+    text = get_persian_color_name(text)
+    persian_digits = '۰۱۲۳۴۵۶۷۸۹'
+    english_digits = '0123456789'
+    for p, e in zip(persian_digits, english_digits):
+        text = text.replace(p, e)
+    return re.sub(r'[^a-zA-Z0-9آ-ی]', '', str(text).strip().lower())
+
+# English to Persian product names
+EN_TO_FA_PRODUCT = {
+    "surface pro 11": "سرفیس پرو 11",
+    "surface pro 10": "سرفیس پرو 10",
+    "surface pro 9": "سرفیس پرو 9",
+    "surface pro 8": "سرفیس پرو 8",
+    "surface laptop 7": "سرفیس لپ تاپ 7",
+    "surface laptop 6": "سرفیس لپ تاپ 6",
+    # Add more mappings as needed
+}
+
+def get_persian_product_name(english_name):
+    key = english_name.strip().lower()
+    return EN_TO_FA_PRODUCT.get(key, english_name)
+
+EN_TO_FA_CPU = {
+    "x elite": "X Elite",
+    "x plus": "X Plus",
+    # Add more mappings as needed
+}
+
+def get_persian_cpu(cpu):
+    return EN_TO_FA_CPU.get(cpu.strip().lower(), cpu)
+
+def best_match(product_name, features, products):
+    persian_name = get_persian_product_name(product_name)
+    cpu_en = features[0] if len(features) > 0 else ""
+    cpu_fa = get_persian_cpu(cpu_en)
+    search_terms = [normalize(product_name), normalize(persian_name), normalize(cpu_en), normalize(cpu_fa)]
+    for i, f in enumerate(features[1:]):  # RAM, SSD (skip color)
+        if f:
+            search_terms.append(normalize(f))
     print(f"    [DEBUG] Normalized search terms: {search_terms}")
-    print(f"    [DEBUG] Original features: {features}")
     best = None
-    best_score = 0
     for prod in products:
         title = normalize(prod['name'])
-        print(f"    [DEBUG] Normalized product title: {title}")
-        print(f"    [DEBUG] Original product name: {prod['name']}")
-        score = sum(term in title for term in search_terms)
-        print(f"    [DEBUG] Match score: {score}")
-        if score > best_score:
+        # All terms must be present for a full match
+        if all(term in title for term in search_terms if term):
             best = prod
-            best_score = score
-    if best and best_score >= min_match:
-        print(f"    [DEBUG] MATCH FOUND (score={best_score}): {best['name']}")
-        return best
-    print(f"    [DEBUG] No strong match for search terms: {search_terms}")
-    print("    [DEBUG] Candidate product titles:")
-    for prod in products:
-        print(f"      - {prod['name']}")
-    return None
+            print(f"    [DEBUG] FULL MATCH FOUND: {prod['name']}")
+            break
+    if not best:
+        print(f"    [DEBUG] No full feature match for search terms: {search_terms}")
+        print("    [DEBUG] Candidate product titles:")
+        for prod in products:
+            print(f"      - {prod['name']}")
+    return best
 
 def scrape_all_products_from_mysurface(url):
     headers = {
@@ -96,6 +145,16 @@ for prod in all_products:
     print(f"    URL: {prod['url']}")
     print(f"    Price: {prod['price']}")
 
+for prod in products:
+    title = normalize(prod['name'])
+    print(f"[DEBUG] Normalized product title: {title}")
+    for term in search_terms:
+        print(f"[DEBUG] Checking if '{term}' in '{title}': {term in title}")
+    if all(term in title for term in search_terms if term):
+        best = prod
+        print(f"    [DEBUG] FULL MATCH FOUND: {prod['name']}")
+        break
+
 # Load Excel and match
 
 df = pd.read_excel('SampleSites.xlsx')
@@ -109,7 +168,8 @@ df['mysurfaceproducturl'] = df['mysurfaceproducturl'].astype('object')
 
 for idx, row in df.iterrows():
     product_name = row['Product name']
-    features = [row['Cpu'], row['Ram'], row['SSD'], row['Color']]
+    # Only use Cpu, Ram, SSD for matching (remove Color)
+    features = [row['Cpu'], row['Ram'], row['SSD']]
     print(f"Processing row {idx+1} for mysurface.ir: {product_name}, features: {features}")
     match = best_match(product_name, features, all_products)
     if match:
@@ -126,4 +186,4 @@ for idx, row in df.iterrows():
     time.sleep(1)
 
 df.to_excel('SampleSites.xlsx', index=False)
-print('Done. Prices and product URLs updated in SampleSites.xlsx.') 
+print('Done. Prices and product URLs updated in SampleSites.xlsx.')
