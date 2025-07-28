@@ -39,13 +39,13 @@ def get_all_products_from_category(category_url):
     }
     while True:
         url = category_url if page == 1 else f"{category_url}?page={page}"
-        print(f"[DEBUG] Scraping: {url}")
+        #print(f"[DEBUG] Scraping: {url}")
         try:
             resp = requests.get(url, timeout=20, headers=headers)
             soup = BeautifulSoup(resp.text, 'html.parser')
             product_links = soup.select('a.title.ellipsis-2')
             if not product_links:
-                print(f"[DEBUG] No product links found on {url}")
+                #print(f"[DEBUG] No product links found on {url}")
                 break
             for a in product_links:
                 title = a.get('title', '').strip() or a.text.strip()
@@ -128,11 +128,11 @@ def best_match(product_name, features, products):
         title = normalize(prod['title'])
         if all(term in title for term in search_terms):
             return prod
-    print(f"    [DEBUG] No strong match for search terms: {search_terms}")
-    print("    [DEBUG] Candidate product titles:")
-    for prod in products:
-        print(f"      - {prod['title']}")
-    return None
+    #print(f"    [DEBUG] No strong match for search terms: {search_terms}")
+    #print("    [DEBUG] Candidate product titles:")
+    #for prod in products:
+        #print(f"      - {prod['title']}")
+    #return None
 
 # --- Main script ---
 
@@ -149,19 +149,19 @@ all_products = []
 for category_url in CATEGORY_URLS:
     all_products.extend(get_all_products_from_category(category_url))
 
-print("\n[ALL SCRAPED PRODUCTS]")
-for prod in all_products:
-    print(f"- {prod['title']} | {prod['url']}")
+#print("\n[ALL SCRAPED PRODUCTS]")
+#for prod in all_products:
+    #print(f"- {prod['title']} | {prod['url']}")
 
 for idx, row in df.iterrows():
     product_name = row['Product name']
     features = [row['Cpu'], row['Ram'], row['SSD']]
     color = str(row['Color']).strip() if 'Color' in row and pd.notna(row['Color']) else ''
-    print(f"Processing row {idx+1} for parsanme.com: {product_name}, features: {features}, color: {color}")
+    #print(f"Processing row {idx+1} for parsanme.com: {product_name}, features: {features}, color: {color}")
     match = best_match(product_name, features, all_products)
     if match and color:
         product_colors = get_product_colors_and_variants(match['url'])
-        print(f"  [DEBUG] Product page colors: {product_colors}")
+        #print(f"  [DEBUG] Product page colors: {product_colors}")
         color_norm = normalize_color(color)
         found = False
         for persian_color, color_key in product_colors:
@@ -174,21 +174,21 @@ for idx, row in df.iterrows():
                     variant_url += f"&variant[color]={color_key}"
                 else:
                     variant_url += f"?variant[color]={color_key}"
-                print(f"  [DEBUG] Matched color: {persian_color} ({color_key}), URL: {variant_url}")
+                #3print(f"  [DEBUG] Matched color: {persian_color} ({color_key}), URL: {variant_url}")
                 price = match['cat_price']
                 df.at[idx, 'parsanmeproducturl'] = variant_url
                 df.at[idx, 'parsanme.com'] = price
                 found = True
                 break
         if not found:
-            print("  [DEBUG] Color does not match any product color. Not inserting product.")
+            #print("  [DEBUG] Color does not match any product color. Not inserting product.")
             df.at[idx, 'parsanmeproducturl'] = ''
             df.at[idx, 'parsanme.com'] = ''
     else:
-        print("  [DEBUG] No matching product found or no color specified.")
+        #print("  [DEBUG] No matching product found or no color specified.")
         df.at[idx, 'parsanmeproducturl'] = ''
         df.at[idx, 'parsanme.com'] = ''
     time.sleep(1)
 
 df.to_excel('SampleSites.xlsx', index=False)
-print('Done. Prices and product URLs updated in SampleSites.xlsx.')
+#print('Done. Prices and product URLs updated in SampleSites.xlsx.')

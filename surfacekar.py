@@ -1,16 +1,17 @@
+
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import time
 import urllib.parse
 import re
-
+#recheck needed . nothing shown on xls
 # color is not a feature for surfacekar.com
 
 def search_surfacekar_url(product_name, features):
     search_query = product_name + ' ' + ' '.join(str(f) for f in features if f)
     search_url = f'https://surfacekar.com/?s={urllib.parse.quote(search_query)}&post_type=product'
-    print(f"[DEBUG] surfacekar.com search URL: {search_url}")
+    #print(f"[DEBUG] surfacekar.com search URL: {search_url}")
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
     }
@@ -41,7 +42,7 @@ def search_surfacekar_url(product_name, features):
                 products.append({'title': title, 'url': href, 'cat_price': price})
         return products
     except Exception as e:
-        print(f"[DEBUG] Error searching surfacekar.com: {e}")
+        #print(f"[DEBUG] Error searching surfacekar.com: {e}")
         return []
 
 def normalize(text):
@@ -58,8 +59,8 @@ def best_match(product_name, features, products, min_match=2):
             best = prod
             best_score = score
     if best_score < min_match:
-        print(f"    [DEBUG] No strong match for search terms: {search_terms}")
-        print("    [DEBUG] Candidate product titles:")
+        #print(f"    [DEBUG] No strong match for search terms: {search_terms}")
+        #print("    [DEBUG] Candidate product titles:")
         for prod in products:
             print(f"      - {prod['title']}")
         return None
@@ -87,21 +88,21 @@ for idx, row in df.iterrows():
     product_name = row['Product name']
     # Remove 'Color' from features for surfacekar.com
     features = [row['Cpu'], row['Ram'], row['SSD']]
-    print(f"Processing row {idx+1} for surfacekar.com: {product_name}, features: {features}")
+    #print(f"Processing row {idx+1} for surfacekar.com: {product_name}, features: {features}")
     products = search_surfacekar_url(product_name, features)
     match = best_match(product_name, features, products)
     if match:
-        print(f"  [DEBUG] Matched product: {match['title']} ({match['url']})")
+        #print(f"  [DEBUG] Matched product: {match['title']} ({match['url']})")
         price = match['cat_price']
-        print(f"  [DEBUG] Category page price used: {price}")
+        #print(f"  [DEBUG] Category page price used: {price}")
         df.at[idx, 'surfacekarproducturl'] = match['url']
     else:
-        print("  [DEBUG] No matching product found.")
+        #print("  [DEBUG] No matching product found.")
         price = ''
         df.at[idx, 'surfacekarproducturl'] = ''
-    print(f"  -> Price found: {price}")
+    #print(f"  -> Price found: {price}")
     df.at[idx, 'surfacekar.com'] = price
     time.sleep(1)
 
 df.to_excel('SampleSites.xlsx', index=False)
-print('Done. Prices and product URLs updated in SampleSites.xlsx.')
+#print('Done. Prices and product URLs updated in SampleSites.xlsx.')

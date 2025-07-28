@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import urllib.parse
 import re
 import json
+# completely working . but cant switch btw colors .
 
 df_sites = pd.read_excel('SampleSites.xlsx')
 
