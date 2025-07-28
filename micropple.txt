@@ -1,0 +1,22 @@
+import re
+
+def find_price_v7(row):
+    # Extract numbers from the excel row
+    excel_numbers = set()
+    excel_numbers.update(re.findall(r'\d+', str(row['Product name'])))
+    excel_numbers.update(re.findall(r'\d+', str(row['Ram'])))
+    excel_numbers.update(re.findall(r'\d+', str(row['SSD'])))
+
+    for _, scraped_row in decoded_df.iterrows():
+        # Extract numbers from the scraped product name
+        scraped_numbers = set(re.findall(r'\d+', scraped_row['decoded_name']))
+
+        # Check if all numbers from the excel row are present in the scraped product name
+        if excel_numbers.issubset(scraped_numbers):
+            return scraped_row['price']
+
+    return 'Not Found'
+
+df_sites['micropple_price_v7'] = df_sites.apply(find_price_v7, axis=1)
+
+display(df_sites[['Product name', 'Cpu', 'Ram', 'SSD', 'micropple_price_v7']])

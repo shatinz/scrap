@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 import time
 import re
 
+#still cant find matches . previoslly could .
+
 def persian_to_english_digits(text):
     persian_digits = '۰۱۲۳۴۵۶۷۸۹'
     english_digits = '0123456789'
@@ -69,21 +71,24 @@ def best_match(product_name, features, products):
     persian_name = get_persian_product_name(product_name)
     cpu_en = features[0] if len(features) > 0 else ""
     cpu_fa = get_persian_cpu(cpu_en)
+    ram_num = re.sub(r'[^0-9]', '', persian_to_english_digits(str(features[1]))) if len(features) > 1 else ''
+    ssd_num = re.sub(r'[^0-9]', '', persian_to_english_digits(str(features[2]))) if len(features) > 2 else ''
     search_terms = [normalize(product_name), normalize(persian_name), normalize(cpu_en), normalize(cpu_fa)]
-    for i, f in enumerate(features[1:]):  # RAM, SSD (skip color)
-        if f:
-            search_terms.append(normalize(f))
-    print(f"    [DEBUG] Normalized search terms: {search_terms}")
+    print(f"    [DEBUG] Normalized search terms: {search_terms}, RAM: {ram_num}, SSD: {ssd_num}")
     best = None
     for prod in products:
         title = normalize(prod['name'])
-        # All terms must be present for a full match
-        if all(term in title for term in search_terms if term):
+        # Check if all search terms are present
+        terms_match = all(term in title for term in search_terms if term)
+        # Check if RAM and SSD numbers are present as standalone numbers
+        ram_match = ram_num and re.search(rf'(?<!\d){ram_num}(?!\d)', title)
+        ssd_match = ssd_num and re.search(rf'(?<!\d){ssd_num}(?!\d)', title)
+        if terms_match and ram_match and ssd_match:
             best = prod
             print(f"    [DEBUG] FULL MATCH FOUND: {prod['name']}")
             break
     if not best:
-        print(f"    [DEBUG] No full feature match for search terms: {search_terms}")
+        print(f"    [DEBUG] No full feature match for search terms: {search_terms}, RAM: {ram_num}, SSD: {ssd_num}")
         print("    [DEBUG] Candidate product titles:")
         for prod in products:
             print(f"      - {prod['name']}")
@@ -145,15 +150,7 @@ for prod in all_products:
     print(f"    URL: {prod['url']}")
     print(f"    Price: {prod['price']}")
 
-for prod in products:
-    title = normalize(prod['name'])
-    print(f"[DEBUG] Normalized product title: {title}")
-    for term in search_terms:
-        print(f"[DEBUG] Checking if '{term}' in '{title}': {term in title}")
-    if all(term in title for term in search_terms if term):
-        best = prod
-        print(f"    [DEBUG] FULL MATCH FOUND: {prod['name']}")
-        break
+
 
 # Load Excel and match
 
@@ -184,6 +181,7 @@ for idx, row in df.iterrows():
     print(f"  -> Price found: {price}")
     df.at[idx, 'mysurface.ir'] = price
     time.sleep(1)
+
 
 df.to_excel('SampleSites.xlsx', index=False)
 print('Done. Prices and product URLs updated in SampleSites.xlsx.')
