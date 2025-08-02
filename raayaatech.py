@@ -77,10 +77,10 @@ def best_match(product_name, features, products):
             all_features_found = False
 
         if all_features_found:
-            print(f"    [DEBUG] Full match found: {title}")
+            # print(f"    [DEBUG] Full match found: {title}")
             return prod
 
-    print(f"    [DEBUG] No full match found for {product_name} with features {features}.")
+    # print(f"    [DEBUG] No full match found for {product_name} with features {features}.")
     return None
 
 def make_request_with_retries(url, headers, retries=3, delay=5):
@@ -90,17 +90,17 @@ def make_request_with_retries(url, headers, retries=3, delay=5):
             resp.raise_for_status()
             return resp
         except (requests.exceptions.RequestException, requests.exceptions.SSLError) as e:
-            print(f"  [DEBUG] Request to {url} failed (attempt {i+1}/{retries}): {e}")
+            # print(f"  [DEBUG] Request to {url} failed (attempt {i+1}/{retries}): {e}")
             if i < retries - 1:
                 time.sleep(delay)
             else:
-                print(f"[DEBUG] All retries failed for {url}.")
+                # print(f"[DEBUG] All retries failed for {url}.")
                 return None
 
 def search_raayaatech(product_name):
     search_query = product_name
     search_url = f'https://raayaatech.com/search?q={requests.utils.quote(search_query)}'
-    print(f"[DEBUG] raayaatech.com search URL: {search_url}")
+    # print(f"[DEBUG] raayaatech.com search URL: {search_url}")
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
     }
@@ -127,7 +127,7 @@ def search_raayaatech(product_name):
                 products.append({'title': title, 'url': href, 'cat_price': price})
         return products
     except Exception as e:
-        print(f"[DEBUG] Error parsing search results for raayaatech.com: {e}")
+        # print(f"[DEBUG] Error parsing search results for raayaatech.com: {e}")
         return []
 
 # English to Persian color names
@@ -185,7 +185,7 @@ def get_product_details_raayaatech(url, target_color=None):
                 product_json = json.loads(script_tag.string)
                 variants = product_json.get('variants', [])
             except json.JSONDecodeError:
-                print(f"  [DEBUG] Failed to decode product JSON from data-product-json tag on {url}")
+                # print(f"  [DEBUG] Failed to decode product JSON from data-product-json tag on {url}")
                 variants = []
 
         # Method 2: If method 1 fails, look for a script tag containing variant information by regex
@@ -201,7 +201,7 @@ def get_product_details_raayaatech(url, target_color=None):
                         variants = json.loads(variants_data)
                         break
                     except json.JSONDecodeError:
-                        print(f"  [DEBUG] Failed to decode variants JSON from regex match on {url}")
+                        # print(f"  [DEBUG] Failed to decode variants JSON from regex match on {url}")
                         variants = []
         
         # If we found variant information, process it
@@ -221,7 +221,7 @@ def get_product_details_raayaatech(url, target_color=None):
                         available_colors.append(color)
             
             if not color_price_map:
-                print(f"  [DEBUG] No color-price mapping found in variants JSON on {url}")
+                # print(f"  [DEBUG] No color-price mapping found in variants JSON on {url}")
                 return [], None
 
             if target_color:
@@ -242,7 +242,7 @@ def get_product_details_raayaatech(url, target_color=None):
             return [], None
 
         # Fallback to scraping visible elements if no JSON found
-        print(f"  [DEBUG] Could not find variants JSON on page {url}. Scraping visible elements as fallback.")
+        # print(f"  [DEBUG] Could not find variants JSON on page {url}. Scraping visible elements as fallback.")
         options = soup.select('select#variant_id option')
         if not options:
             price_tag = soup.select_one('span.price#ProductPrice')
@@ -266,7 +266,7 @@ def get_product_details_raayaatech(url, target_color=None):
         return available_colors, price
 
     except Exception as e:
-        print(f"[DEBUG] Error in get_product_details_raayaatech for {url}: {e}")
+        # print(f"[DEBUG] Error in get_product_details_raayaatech for {url}: {e}")
         return [], None
 
 # --- Main script ---
@@ -284,7 +284,7 @@ for idx, row in df.iterrows():
     product_name = row['Product name']
     features = [row['Cpu'], row['Ram'], row['SSD']]
     color = str(row['Color']).strip() if 'Color' in row and pd.notna(row['Color']) else ''
-    print(f"Processing row {idx+1} for raayaatech.com: {product_name}, features: {features}, color: {color}")
+    # print(f"Processing row {idx+1} for raayaatech.com: {product_name}, features: {features}, color: {color}")
     
     products = search_raayaatech(product_name)
     match = best_match(product_name, features, products)
@@ -293,7 +293,7 @@ for idx, row in df.iterrows():
         product_colors, price = get_product_details_raayaatech(match['url'], color if color else None)
         
         if color:
-            print(f"  [DEBUG] Product page colors: {product_colors}")
+            # print(f"  [DEBUG] Product page colors: {product_colors}")
             color_norm = normalize_color(color)
             
             product_colors_norm = []
@@ -304,35 +304,35 @@ for idx, row in df.iterrows():
                     product_colors_norm.append(normalize_color(en_c))
 
             if any(color_norm == pc for pc in product_colors_norm):
-                print(f"  [DEBUG] Matched product with correct color: {match['title']} ({match['url']})")
+                # print(f"  [DEBUG] Matched product with correct color: {match['title']} ({match['url']})")
                 if price:
-                    print(f"  [DEBUG] Price for color '{color}' from product page: {price}")
+                    # print(f"  [DEBUG] Price for color '{color}' from product page: {price}")
                     df.at[idx, 'raayaatechproducturl'] = match['url']
                     df.at[idx, 'raayaatech.com'] = price
                 else:
-                    print(f"  [DEBUG] Color matched, but no price found on product page. Using category page price.")
+                    # print(f"  [DEBUG] Color matched, but no price found on product page. Using category page price.")
                     df.at[idx, 'raayaatechproducturl'] = match['url']
                     df.at[idx, 'raayaatech.com'] = match['cat_price']
             else:
-                print(f"  [DEBUG] Color '{color}' not found in available colors: {product_colors}. Not inserting product.")
+                # print(f"  [DEBUG] Color '{color}' not found in available colors: {product_colors}. Not inserting product.")
                 df.at[idx, 'raayaatechproducturl'] = ''
                 df.at[idx, 'raayaatech.com'] = ''
         else: # No color specified
-            print(f"  [DEBUG] Matched product (no color specified): {match['title']} ({match['url']})")
+            # print(f"  [DEBUG] Matched product (no color specified): {match['title']} ({match['url']})")
             if price:
-                 print(f"  [DEBUG] Default price from product page: {price}")
+                 # print(f"  [DEBUG] Default price from product page: {price}")
                  df.at[idx, 'raayaatechproducturl'] = match['url']
                  df.at[idx, 'raayaatech.com'] = price
             else:
-                print(f"  [DEBUG] No price on product page, using category page price: {match['cat_price']}")
+                # print(f"  [DEBUG] No price on product page, using category page price: {match['cat_price']}")
                 df.at[idx, 'raayaatechproducturl'] = match['url']
                 df.at[idx, 'raayaatech.com'] = match['cat_price']
     else:
         # No match found
-        print("  [DEBUG] No matching product found.")
+        # print("  [DEBUG] No matching product found.")
         df.at[idx, 'raayaatechproducturl'] = ''
         df.at[idx, 'raayaatech.com'] = ''
     time.sleep(1)
 
 df.to_excel('SampleSites.xlsx', index=False)
-print('Done. Prices and product URLs updated in SampleSites.xlsx.')
+# print('Done. Prices and product URLs updated in SampleSites.xlsx.')

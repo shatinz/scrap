@@ -7,7 +7,7 @@ import urllib.parse
 import re
 import json
 # solved . scrap all colors but not matching color with new price needed.
-print("starting")
+# print("starting")
 df_sites = pd.read_excel('SampleSites.xlsx')
 
 base_url = "https://micropple.ir/product-category/microsoft/tablet-microsoft/page/{}/"
@@ -15,7 +15,7 @@ scraped_products = []
 
 for page_num in range(1, 3):
     url = base_url.format(page_num)
-    print(f"Scraping page: {url}")
+    # print(f"Scraping page: {url}")
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -49,7 +49,7 @@ def fetch_product_page(url):
             response.raise_for_status()
             return response.text
         except requests.exceptions.RequestException as e:
-            print(f"Error fetching {url}: {e}")
+            # print(f"Error fetching {url}: {e}")
             return None
     return None
 
@@ -72,7 +72,7 @@ def extract_colors_from_variations(variations_json):
                     colors.append(color)
             return colors
         except (json.JSONDecodeError, IndexError, KeyError) as e:
-            print(f"Error parsing variations: {e}")
+            # print(f"Error parsing variations: {e}")
             return []
     return []
 
@@ -102,18 +102,18 @@ def find_price_and_url_v3(row):
 
     excel_numbers = set(re.findall(r'\d+', product_name_xlsx + " " + ram_xlsx + " " + ssd_xlsx))
 
-    print("\n" + "="*50)
-    print(f"Processing Excel row: {row['Product name']} | RAM: {row['Ram']} | SSD: {row['SSD']} | CPU: {row['Cpu']} | Color: {row['Color']}")
-    print(f"Normalized Excel data: name='{product_name_xlsx}', ram='{ram_xlsx}', ssd='{ssd_xlsx}', cpu='{cpu_xlsx}', color='{color_xlsx}'")
-    print(f"Extracted numbers from Excel row: {excel_numbers}")
-    print("="*50)
+    # print("\n" + "="*50)
+    # print(f"Processing Excel row: {row['Product name']} | RAM: {row['Ram']} | SSD: {row['SSD']} | CPU: {row['Cpu']} | Color: {row['Color']}")
+    # print(f"Normalized Excel data: name='{product_name_xlsx}', ram='{ram_xlsx}', ssd='{ssd_xlsx}', cpu='{cpu_xlsx}', color='{color_xlsx}'")
+    # print(f"Extracted numbers from Excel row: {excel_numbers}")
+    # print("="*50)
 
     for _, scraped_row in decoded_df.iterrows():
         decoded_name = scraped_row['decoded_name'].lower()
         
-        print(f"\n--- Comparing with scraped product ---")
-        print(f"Name: {decoded_name}")
-        print(f"URL: {scraped_row['product_url']}")
+        # print(f"\n--- Comparing with scraped product ---")
+        # print(f"Name: {decoded_name}")
+        # print(f"URL: {scraped_row['product_url']}")
 
         scraped_numbers = set(re.findall(r'\d+', decoded_name))
         
@@ -132,23 +132,24 @@ def find_price_and_url_v3(row):
         scraped_colors = extract_colors_from_variations(variations_json)
         normalized_scraped_colors = [decode_and_normalize_color(c) for c in scraped_colors]
 
-        print(f"Scraped Details: numbers={scraped_numbers}, cpu='{scraped_cpu}', colors='{normalized_scraped_colors}' (raw: '{scraped_colors}')")
+        # print(f"Scraped Details: numbers={scraped_numbers}, cpu='{scraped_cpu}', colors='{normalized_scraped_colors}' (raw: '{scraped_colors}')")
 
         numbers_match = excel_numbers.issubset(scraped_numbers)
         cpu_match = cpu_xlsx in scraped_cpu
         color_match = color_xlsx in normalized_scraped_colors
 
-        print(f"Checking match: Numbers ({numbers_match}), CPU ({cpu_match}), Color ({color_match})")
+        # print(f"Checking match: Numbers ({numbers_match}), CPU ({cpu_match}), Color ({color_match})")
 
         if numbers_match and cpu_match and color_match:
-            print(">>> Match Found! <<<")
+            # print(">>> Match Found! <<<")
             return scraped_row['price'], scraped_row['product_url']
         else:
-            print("--- No Match ---")
+            # print("--- No Match ---")
+            pass
 
-    print("\n" + "="*50)
-    print(f"Finished processing Excel row: {row['Product name']}. No match found in all scraped products.")
-    print("="*50)
+    # print("\n" + "="*50)
+    # print(f"Finished processing Excel row: {row['Product name']}. No match found in all scraped products.")
+    # print("="*50)
     return 'Not Found', 'Not Found'
 
 df_sites[['micropple.ir', 'microppleproducturl']] = df_sites.apply(find_price_and_url_v3, axis=1, result_type='expand')
@@ -165,4 +166,4 @@ df_sites['micropple.ir'] = df_sites['micropple.ir'].apply(clean_price)
 
 df_sites.to_excel('SampleSites.xlsx', index=False)
 
-print(df_sites[['Product name', 'Cpu', 'Ram', 'SSD', 'Color', 'micropple.ir', 'microppleproducturl']])
+# print(df_sites[['Product name', 'Cpu', 'Ram', 'SSD', 'Color', 'micropple.ir', 'microppleproducturl']])

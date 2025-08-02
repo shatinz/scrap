@@ -12,7 +12,7 @@ from selenium.webdriver.common.by import By
 def search_yasinrayan_url(product_name, features):
     search_query = product_name + ' ' + ' '.join(str(f) for f in features if f)
     search_url = f'https://www.yasinrayan.com/?s={urllib.parse.quote(search_query)}&post_type=product'
-    print(f"[DEBUG] yasinrayan.com search URL: {search_url}")
+    # print(f"[DEBUG] yasinrayan.com search URL: {search_url}")
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
     }
@@ -39,7 +39,7 @@ def search_yasinrayan_url(product_name, features):
                 products.append({'title': title, 'url': href, 'cat_price': price})
         return products
     except Exception as e:
-        print(f"[DEBUG] Error searching yasinrayan.com: {e}")
+        # print(f"[DEBUG] Error searching yasinrayan.com: {e}")
         return []
 
 def normalize(text):
@@ -72,10 +72,10 @@ def get_strong_matches(product_name, features, products):
             full_matches.append(prod)
 
     if not full_matches:
-        print(f"    [DEBUG] No full matches found for search terms: {search_terms}")
-        print("    [DEBUG] Candidate product titles:")
-        for prod in products:
-            print(f"      - {prod['title']}")
+        # print(f"    [DEBUG] No full matches found for search terms: {search_terms}")
+        # print("    [DEBUG] Candidate product titles:")
+        # for prod in products:
+            # print(f"      - {prod['title']}")
         return []
 
     return full_matches
@@ -101,7 +101,7 @@ def get_available_colors(product_url):
             colors.append((color_name.strip(), enabled))
         return colors
     except Exception as e:
-        print(f"[DEBUG] Error fetching colors from {product_url}: {e}")
+        # print(f"[DEBUG] Error fetching colors from {product_url}: {e}")
         return []
 
 def get_available_colors_selenium(product_url):
@@ -126,7 +126,7 @@ def get_available_colors_selenium(product_url):
         driver.quit()
         return colors
     except Exception as e:
-        print(f"[DEBUG] Error fetching colors from {product_url} with Selenium: {e}")
+        # print(f"[DEBUG] Error fetching colors from {product_url} with Selenium: {e}")
         return []
 
 def map_color_name(color):
@@ -175,7 +175,7 @@ for idx, row in df.iterrows():
     product_name_mapped = map_product_name(product_name)
     desired_color_mapped = map_color_name(desired_color)
 
-    print(f"Processing row {idx+1} for yasinrayan.com: {product_name} (mapped: {product_name_mapped}), features: {features}, color: {desired_color} (mapped: {desired_color_mapped})")
+    # print(f"Processing row {idx+1} for yasinrayan.com: {product_name} (mapped: {product_name_mapped}), features: {features}, color: {desired_color} (mapped: {desired_color_mapped})")
     
     # Use the original English name for the URL search query, as it's more likely to work with the site's search engine
     products = search_yasinrayan_url(product_name, features)
@@ -187,33 +187,36 @@ for idx, row in df.iterrows():
     found_match_with_color = False
 
     if strong_matches:
-        print(f"  [DEBUG] Found {len(strong_matches)} strong match(es). Checking for color availability...")
+        # print(f"  [DEBUG] Found {len(strong_matches)} strong match(es). Checking for color availability...")
         for i, match in enumerate(strong_matches):
-            print(f"    [DEBUG] Checking match {i+1}/{len(strong_matches)}: {match['title']}")
+            # print(f"    [DEBUG] Checking match {i+1}/{len(strong_matches)}: {match['title']}")
             available_colors = get_available_colors_selenium(match['url'])
-            print(f"      [DEBUG] Available colors: {available_colors}")
+            # print(f"      [DEBUG] Available colors: {available_colors}")
             
             # Check if the desired color is present and enabled
             if any(normalize(desired_color_mapped) == normalize(c[0]) and c[1] for c in available_colors):
-                print(f"      [DEBUG] Color match found and enabled: {desired_color_mapped}")
+                # print(f"      [DEBUG] Color match found and enabled: {desired_color_mapped}")
                 price = match['cat_price']
                 price = price.replace('تومان', '').strip()
                 price = persian_to_english_digits(price)
                 product_url = match['url']
                 found_match_with_color = True
                 break  # Stop after finding the first product with the right color
-            else:
-                print(f"      [DEBUG] Desired color '{desired_color_mapped}' not found or is disabled for this product.")
+            #else:
+                # print(f"      [DEBUG] Desired color '{desired_color_mapped}' not found or is disabled for this product.")
         
-        if not found_match_with_color:
-            print(f"  [DEBUG] Checked all {len(strong_matches)} strong matches, but none had the desired color '{desired_color_mapped}' available.")
-    else:
-        print("  [DEBUG] No matching product found.")
+        #if not found_match_with_color:
+             #print(f"  [DEBUG] Checked all {len(strong_matches)} strong matches, but none had the desired color '{desired_color_mapped}' available.")
+            #return
+    #else:
+         #print("  [DEBUG] No matching product found.")
+        
+        #return
 
     df.at[idx, 'yasinrayanproducturl'] = product_url
-    print(f"  -> Price found: {price}")
+    # print(f"  -> Price found: {price}")
     df.at[idx, 'yasinrayan.com'] = price
     time.sleep(1)
 
 df.to_excel('SampleSites.xlsx', index=False)
-print('Done. Prices and product URLs updated in SampleSites.xlsx.')
+# print('Done. Prices and product URLs updated in SampleSites.xlsx.')

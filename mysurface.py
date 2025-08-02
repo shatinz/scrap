@@ -49,12 +49,12 @@ def normalize(text):
 def scrape_all_products_mysurface(base_url):
     products = []
     url = f"{base_url.rstrip('/')}/page/1/"
-    print(f"[DEBUG] Scraping: {url}")
+    # print(f"[DEBUG] Scraping: {url}")
     try:
         resp = requests.get(url, timeout=20)
         resp.raise_for_status()
     except Exception as e:
-        print(f"[DEBUG] Error scraping {url}: {e}")
+        # print(f"[DEBUG] Error scraping {url}: {e}")
         return products
     soup = BeautifulSoup(resp.text, 'html.parser')
     product_divs = soup.find_all('div', class_='product-small')
@@ -94,7 +94,8 @@ def get_color_from_product_page(url):
                     color = text.replace('رنگ:', '').strip()
                     return normalize(color)
     except Exception as e:
-        print(f"[DEBUG] Error scraping product page {url}: {e}")
+        # print(f"[DEBUG] Error scraping product page {url}: {e}")
+        pass
     return None
 
 def best_match(product_name, features, products):
@@ -123,36 +124,37 @@ def best_match(product_name, features, products):
         search_terms_fa.append(ssd_num)
     search_terms_fa = [term for term in search_terms_fa if term]
 
-    print(f"\n[DEBUG] Searching for: {product_name} | CPU: {cpu} | RAM: {ram_num} | SSD: {ssd_num} | Color: {color}")
-    print(f"[DEBUG] English search terms: {search_terms_en}")
-    print(f"[DEBUG] Persian search terms: {search_terms_fa}")
+    # print(f"\n[DEBUG] Searching for: {product_name} | CPU: {cpu} | RAM: {ram_num} | SSD: {ssd_num} | Color: {color}")
+    # print(f"[DEBUG] English search terms: {search_terms_en}")
+    # print(f"[DEBUG] Persian search terms: {search_terms_fa}")
 
     for prod in products:
         title = normalize(prod['name'])
-        print(f"[DEBUG]   Comparing with: {prod['name']} -> {title}")
+        # print(f"[DEBUG]   Comparing with: {prod['name']} -> {title}")
         
         # Try matching with English terms first, then Persian
         if all(term in title for term in search_terms_en) or all(term in title for term in search_terms_fa):
-            print(f"[DEBUG]   Potential match found: {prod['name']}. Checking color...")
+            # print(f"[DEBUG]   Potential match found: {prod['name']}. Checking color...")
             page_color = get_color_from_product_page(prod['url'])
-            print(f"[DEBUG]     Page color: {page_color}")
+            # print(f"[DEBUG]     Page color: {page_color}")
             persian_colors = get_persian_color_name(color)
             if page_color and (normalize(color) in page_color or page_color in normalize(color) or any(normalize(c) in page_color for c in persian_colors) or any(page_color in normalize(c) for c in persian_colors)):
-                print(f"[DEBUG]   COLOR MATCH FOUND: {prod['name']}")
+                # print(f"[DEBUG]   COLOR MATCH FOUND: {prod['name']}")
                 return prod
             else:
-                print(f"[DEBUG]     Color mismatch.")
+                # print(f"[DEBUG]     Color mismatch.")
+                pass
 
-    print("[DEBUG]   NO MATCH FOUND")
+    # print("[DEBUG]   NO MATCH FOUND")
     return None
 
 if __name__ == "__main__":
     BASE_URL = "https://mysurface.ir/surface-pro/"
     products = scrape_all_products_mysurface(BASE_URL)
-    print("\n[ALL SCRAPED PRODUCTS]")
-    for prod in products:
-        print(f"- {prod['name']} | {prod['url']} | {prod['price']}")
-    print("-" * 20)
+    # print("\n[ALL SCRAPED PRODUCTS]")
+    # for prod in products:
+        # print(f"- {prod['name']} | {prod['url']} | {prod['price']}")
+    # print("-" * 20)
 
     # Load Excel and match
     df = pd.read_excel('SampleSites.xlsx')
@@ -166,20 +168,20 @@ if __name__ == "__main__":
 
     for idx, row in df.iterrows():
         product_name = row['Product name']
-        features = [row['Cpu'], row['Ram'], row['SSD'], row['Color']]
+        features = [row['Cpu'], row['Ram'], 'SSD', row['Color']]
         
-        print(f"\n{'='*20}\n[INFO] Matching product from Excel row {idx+2}: {product_name} {features}")
+        # print(f"\n{'='*20}\n[INFO] Matching product from Excel row {idx+2}: {product_name} {features}")
         
         match = best_match(product_name, features, products)
         
         if match:
-            print(f"[INFO]   -> Matched to: {match['name']} | Price: {match['price']}")
+            # print(f"[INFO]   -> Matched to: {match['name']} | Price: {match['price']}")
             df.at[idx, 'mysurfaceproducturl'] = match['url']
             df.at[idx, 'mysurface.ir'] = match['price']
         else:
-            print("[INFO]   -> No match found in scraped products.")
+            # print("[INFO]   -> No match found in scraped products.")
             df.at[idx, 'mysurfaceproducturl'] = ''
             df.at[idx, 'mysurface.ir'] = ''
             
     df.to_excel('SampleSites.xlsx', index=False)
-    print('\nDone. Prices and product URLs updated in SampleSites.xlsx.')
+    # print('\nDone. Prices and product URLs updated in SampleSites.xlsx.')
