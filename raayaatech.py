@@ -3,11 +3,9 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import re
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
-from selenium.webdriver.common.by import By
+import json
 
-#
+#solved and can find matched color with matched price
 
 # Dictionaries for feature translation
 EN_TO_FA_CPU = {
@@ -57,48 +55,47 @@ def best_match(product_name, features, products):
     ssd_en = features[2] if len(features) > 2 else ""
     ssd_fa = get_persian_feature(ssd_en, "ssd")
 
-    # Normalize all forms
-    search_terms = [
-        (normalize(product_name), 2),  # Product name gets a higher weight
-        (normalize(cpu_en), 1),
-        (normalize(cpu_fa), 1),
-        (normalize(ram_en), 1),
-        (normalize(ram_fa), 1),
-        (normalize(ssd_en), 1),
-        (normalize(ssd_fa), 1),
-    ]
-
-    best_score = 0
-    best_prod = None
-
     for prod in products:
-        title = normalize(prod['title'])
-        
+        title = prod['title']
+        normalized_title = normalize(title)
+
         # Exclude accessories like keyboards and pens
-        if 'keyboard' in title or 'pen' in title or 'کیبورد' in title or 'قلم' in title:
+        if 'keyboard' in normalized_title or 'pen' in normalized_title or 'کیبورد' in normalized_title or 'قلم' in normalized_title:
             continue
 
-        current_score = 0
-        for term, weight in search_terms:
-            if term and term in title:
-                current_score += weight
-        
-        if current_score > best_score:
-            best_score = current_score
-            best_prod = prod
+        # Check for product name
+        if normalize(product_name) not in normalized_title:
+            continue
 
-    if best_prod:
-        print(f"    [DEBUG] Best match found with score {best_score}: {best_prod['title']}")
-    else:
-        print(f"    [DEBUG] No suitable match found for search terms.")
-        print("    [DEBUG] Candidate product titles (after filtering):")
-        for prod in products:
-            # Re-check filter for logging purposes
-            title = normalize(prod['title'])
-            if 'keyboard' not in title and 'pen' not in title and 'کیبورد' not in title and 'قلم' not in title:
-                 print(f"      - {prod['title']}")
+        # Check for all specified features
+        all_features_found = True
+        if cpu_en and not (normalize(cpu_en) in normalized_title or normalize(cpu_fa) in normalized_title):
+            all_features_found = False
+        if ram_en and not (normalize(ram_en) in normalized_title or normalize(ram_fa) in normalized_title):
+            all_features_found = False
+        if ssd_en and not (normalize(ssd_en) in normalized_title or normalize(ssd_fa) in normalized_title):
+            all_features_found = False
 
-    return best_prod
+        if all_features_found:
+            print(f"    [DEBUG] Full match found: {title}")
+            return prod
+
+    print(f"    [DEBUG] No full match found for {product_name} with features {features}.")
+    return None
+
+def make_request_with_retries(url, headers, retries=3, delay=5):
+    for i in range(retries):
+        try:
+            resp = requests.get(url, timeout=30, headers=headers)
+            resp.raise_for_status()
+            return resp
+        except (requests.exceptions.RequestException, requests.exceptions.SSLError) as e:
+            print(f"  [DEBUG] Request to {url} failed (attempt {i+1}/{retries}): {e}")
+            if i < retries - 1:
+                time.sleep(delay)
+            else:
+                print(f"[DEBUG] All retries failed for {url}.")
+                return None
 
 def search_raayaatech(product_name):
     search_query = product_name
@@ -107,8 +104,11 @@ def search_raayaatech(product_name):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
     }
+    resp = make_request_with_retries(search_url, headers)
+    if not resp:
+        return []
+    
     try:
-        resp = requests.get(search_url, timeout=20, headers=headers)
         soup = BeautifulSoup(resp.text, 'html.parser')
         products = []
         for prod_div in soup.select('div.col-xl-3.price_on, div.col-lg-4.price_on, div.col-md-4.price_on'):
@@ -127,7 +127,7 @@ def search_raayaatech(product_name):
                 products.append({'title': title, 'url': href, 'cat_price': price})
         return products
     except Exception as e:
-        print(f"[DEBUG] Error searching raayaatech.com: {e}")
+        print(f"[DEBUG] Error parsing search results for raayaatech.com: {e}")
         return []
 
 # English to Persian color names
@@ -161,101 +161,112 @@ def normalize_color(text):
         text = text.replace(p, e)
     return re.sub(r'[^a-zA-Z0-9آ-ی]', '', str(text).strip().lower())
 
-def get_product_details_raayaatech_selenium(url, target_color=None):
+def get_product_details_raayaatech(url, target_color=None):
     """
-    Extracts color options and price from the product page using Selenium.
-    If a target_color is provided, it selects the color and gets the updated price.
-    Returns a tuple: (list_of_available_colors, price).
+    Extracts color options and prices from the product page using BeautifulSoup.
+    It assumes variant information is stored in a JavaScript object in the page source.
     """
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+    }
+    resp = make_request_with_retries(url, headers)
+    if not resp:
+        return [], None
+
     try:
-        options = FirefoxOptions()
-        options.add_argument('--headless')
-        driver = webdriver.Firefox(options=options)
-        driver.get(url)
-        time.sleep(3) # Initial wait for page load
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        variants = []
+        variants_data = None
 
-        color_list = []
-        target_color_selected = False
-
-        # Find all select elements and check if they are for color
-        selects = driver.find_elements(By.TAG_NAME, 'select')
-        for select in selects:
-            label_text = ""
+        # Method 1: Look for a specific script tag with a JSON data attribute (common in Shopify)
+        script_tag = soup.find('script', {'type': 'application/json', 'data-product-json': True})
+        if script_tag and script_tag.string:
             try:
-                # Logic to find the label for the select element
-                select_id = select.get_attribute('id')
-                if select_id:
-                    labels = driver.find_elements(By.XPATH, f"//label[@for='{select_id}']")
-                    if labels:
-                        label_text = labels[0].text
-                if not label_text:
-                    # Try to find label as a parent or in a parent div
-                    parent = select.find_element(By.XPATH, '..')
-                    if parent.tag_name == 'label':
-                        label_text = parent.text
-                    else:
-                        # Common pattern: <div class="..."><label>...</label><select>...</select></div>
-                        grandparent = parent.find_element(By.XPATH, '..')
-                        if 'selector-variant' in grandparent.get_attribute('class'):
-                             label_tag = grandparent.find_element(By.TAG_NAME, 'label')
-                             if label_tag:
-                                 label_text = label_tag.text
+                product_json = json.loads(script_tag.string)
+                variants = product_json.get('variants', [])
+            except json.JSONDecodeError:
+                print(f"  [DEBUG] Failed to decode product JSON from data-product-json tag on {url}")
+                variants = []
 
-            except Exception:
-                pass # Ignore if label not found
-
-            if 'رنگ' in label_text or 'color' in label_text.lower():
-                options_elems = select.find_elements(By.TAG_NAME, 'option')
-                for option in options_elems:
-                    color_name = option.text.strip()
-                    if color_name:
-                        color_list.append(color_name)
-                    
-                    if target_color and not target_color_selected:
-                        # Normalize and compare colors
-                        norm_option_color = normalize_color(color_name)
-                        norm_target_color = normalize_color(target_color)
-                        en_option_color = normalize_color(get_english_color_name(color_name))
-
-                        if norm_option_color == norm_target_color or en_option_color == norm_target_color:
-                            print(f"  [DEBUG] Selecting color: {color_name}")
-                            option.click()
-                            target_color_selected = True
-                            time.sleep(2) # Wait for price to update
-                # Found color select, no need to check other selects
-                break
-        
-        price = ''
-        try:
-            # More robust price finding
-            price_selectors = [
-                'div.price-area span.price',
-                'span.price',
-                '.product-info-price .price-new',
-                '.price-box .price',
-                '.price-container .price',
-                '#price-old',
-                '#price-new'
-            ]
-            for selector in price_selectors:
-                try:
-                    price_tag = driver.find_element(By.CSS_SELECTOR, selector)
-                    if price_tag and price_tag.is_displayed():
-                        price = price_tag.text.strip()
-                        if price:
-                            break
-                except Exception:
+        # Method 2: If method 1 fails, look for a script tag containing variant information by regex
+        if not variants:
+            for script in soup.find_all('script'):
+                if not script.string:
                     continue
-        except Exception as e:
-            print(f"  [DEBUG] Could not find price on page {url}. Error: {e}")
+                # More flexible regex to find a variants array
+                match = re.search(r'variants\s*[:=]\s*(\[.+?\])\s*[;,]', script.string, re.DOTALL)
+                if match:
+                    variants_data = match.group(1)
+                    try:
+                        variants = json.loads(variants_data)
+                        break
+                    except json.JSONDecodeError:
+                        print(f"  [DEBUG] Failed to decode variants JSON from regex match on {url}")
+                        variants = []
+        
+        # If we found variant information, process it
+        if variants:
+            color_price_map = {}
+            available_colors = []
+            for variant in variants:
+                color = variant.get('option1')
+                price_val = variant.get('price')
+                if color and price_val:
+                    # Format price with commas, assuming it's in the main currency unit (Toman)
+                    formatted_price = f"{int(price_val):,d}"
+                    normalized_c = normalize_color(color)
+                    if normalized_c not in color_price_map:
+                        color_price_map[normalized_c] = formatted_price
+                    if color not in available_colors:
+                        available_colors.append(color)
+            
+            if not color_price_map:
+                print(f"  [DEBUG] No color-price mapping found in variants JSON on {url}")
+                return [], None
 
-        driver.quit()
-        return color_list, price
+            if target_color:
+                norm_target_color = normalize_color(target_color)
+                if norm_target_color in color_price_map:
+                    return available_colors, color_price_map[norm_target_color]
+                
+                en_target_color = normalize_color(get_english_color_name(target_color))
+                if en_target_color in color_price_map:
+                    return available_colors, color_price_map[en_target_color]
+
+                return available_colors, None # Target color not found
+            
+            if available_colors:
+                first_color_norm = normalize_color(available_colors[0])
+                return available_colors, color_price_map.get(first_color_norm)
+            
+            return [], None
+
+        # Fallback to scraping visible elements if no JSON found
+        print(f"  [DEBUG] Could not find variants JSON on page {url}. Scraping visible elements as fallback.")
+        options = soup.select('select#variant_id option')
+        if not options:
+            price_tag = soup.select_one('span.price#ProductPrice')
+            price = price_tag.get_text(strip=True).split(" ")[0] if price_tag else None
+            return [], price
+
+        available_colors = [opt.text.split('/')[0].strip() for opt in options if opt.text.split('/')[0].strip()]
+        price_tag = soup.select_one('span.price#ProductPrice')
+        price = price_tag.get_text(strip=True).split(" ")[0] if price_tag else None
+
+        if not available_colors:
+            return [], price
+
+        if target_color:
+            norm_target_color = normalize_color(target_color)
+            for color in available_colors:
+                if normalize_color(color) == norm_target_color or normalize_color(get_english_color_name(color)) == norm_target_color:
+                    return available_colors, price
+            return available_colors, None
+        
+        return available_colors, price
 
     except Exception as e:
-        print(f"[DEBUG] Error in get_product_details_raayaatech_selenium for {url}: {e}")
-        if 'driver' in locals() and driver:
-            driver.quit()
+        print(f"[DEBUG] Error in get_product_details_raayaatech for {url}: {e}")
         return [], None
 
 # --- Main script ---
@@ -279,7 +290,7 @@ for idx, row in df.iterrows():
     match = best_match(product_name, features, products)
     
     if match:
-        product_colors, price = get_product_details_raayaatech_selenium(match['url'], color if color else None)
+        product_colors, price = get_product_details_raayaatech(match['url'], color if color else None)
         
         if color:
             print(f"  [DEBUG] Product page colors: {product_colors}")
