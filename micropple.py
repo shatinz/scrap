@@ -1,4 +1,5 @@
 #!git clone https://github.com/shatinz/scrap.git
+#!git switch main
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -9,20 +10,24 @@ import json
 
 df_sites = pd.read_excel('SampleSites.xlsx')
 
-url = "https://micropple.ir/product-category/microsoft/tablet-microsoft/page/1/"
-response = requests.get(url)
-soup = BeautifulSoup(response.content, 'html.parser')
-
-products = soup.find_all('div', class_='wd-product')
-
+base_url = "https://micropple.ir/product-category/microsoft/tablet-microsoft/page/{}/"
 scraped_products = []
-for product in products:
-    product_link = product.find('a', class_='product-image-link')
-    product_name = product_link.get('href').split('/')[-2]
-    product_url = product_link.get('href')
-    price_element = product.find('span', class_='price')
-    price = price_element.text.strip() if price_element else 'N/A'
-    scraped_products.append({'product_name': product_name, 'price': price, 'product_url': product_url})
+
+for page_num in range(1, 3):
+    url = base_url.format(page_num)
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    products = soup.find_all('div', class_='wd-product')
+
+    for product in products:
+        product_link = product.find('a', class_='product-image-link')
+        if product_link and product_link.has_attr('href'):
+            product_name = product_link.get('href').split('/')[-2]
+            product_url = product_link.get('href')
+            price_element = product.find('span', class_='price')
+            price = price_element.text.strip() if price_element else 'N/A'
+            scraped_products.append({'product_name': product_name, 'price': price, 'product_url': product_url})
 
 scraped_df = pd.DataFrame(scraped_products)
 

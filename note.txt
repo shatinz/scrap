@@ -1,0 +1,195 @@
+[DEBUG] Scraping: https://parsanme.com/store/microsoft-surface
+[DEBUG] Scraping: https://parsanme.com/store/surface-pro
+
+[ALL SCRAPED PRODUCTS]
+- سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-64GB-1TB | https://parsanme.com/product/PI-79671387/Microsoft-Surface-Pro-10-13inch-Core-Ultra-7-64GB-1TB-WiFi
+- سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-512GB | https://parsanme.com/product/PI-34516529/Microsoft-Surface-Pro-10-13inch-Core-Ultra-7-16GB-512GB-WiFi
+- سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 5-8GB-256GB +کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس | https://parsanme.com/product/PI-51281965/Microsoft-Surface-Pro-10-13inch-Core-Ultra-5-8GB-256GB-WiFi+Surface-Copilot-Pro-X-Keyboard
+- سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Plus 16GB-512GB | https://parsanme.com/product/PI-39367178/Surface-Pro-11-Snapdragon-X-Plus-16GB-512GB-13inch
+- سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-256GB | https://parsanme.com/product/PI-21978263/Microsoft-Surface-Pro-10-13inch-Core-Ultra-7-16GB-256GB-WiFi
+- سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 5-8GB-256GB | https://parsanme.com/product/PI-43789595/Microsoft-Surface-Pro-10-13inch-Core-Ultra-5-8GB-256GB-WiFi
+- سرفیس پرو ۱۲ اینچ Snapdragon X Plus 16GB-512GB | https://parsanme.com/product/PI-39769578/Surface-Pro-Snapdragon-X-Plus-16GB-512GB-12inch
+- سرفیس پرو 8 مایکروسافت 13 اینچ Core i7-16GB-1TB نسخه اسلیم باکس | https://parsanme.com/product/PI-99781128/Surface-Pro-8-Microsoft-13-inch-Core-i7-16GB-1TB-Slim-Box-version
+- لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 64GB - 2TB - RTX 4060 | https://parsanme.com/product/PI-59435891/Laptop-Studio-2-14-inch-Core-i7-64GB-2TB
+- لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 32GB - 1TB - RTX 4050 | https://parsanme.com/product/PI-79144294/Laptop-Studio-2-14-inch-Core-i7-32GB-1TB
+- لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 16GB - 512GB - RTX 2000 | https://parsanme.com/product/PI-32279798/Laptop-Studio-2-14-inch-Core-i7-16GB-512GB
+- لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 16GB - 512GB - RTX 4050 | https://parsanme.com/product/PI-39497253/Laptop-Studio-2-14-inch-Core-i7-16GB-512GB
+- لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 -16GB - 512GB - RTX 4060 | https://parsanme.com/product/PI-18266225/Laptop-Studio-2-14-inch-Core-i7-16GB-512GB
+- لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 64GB - 1TB - RTX 4060 | https://parsanme.com/product/PI-52591613/Laptop-Studio-2-14-inch-Core-i7-64GB-1TB
+- لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 16GB - 512GB - Intel  Xe | https://parsanme.com/product/PI-86811818/Laptop-Studio-2-14-inch-Core-i7-16GB-512GB
+- لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 32GB - 1TB - RTX 2000 | https://parsanme.com/product/PI-51282837/Laptop-Studio-2-14-inch-Core-i7-32GB-1TB
+- سرفیس لپ تاپ 7 مایکروسافت 13.8 اینچ Snapdragon X Elite 64GB-1TB | https://parsanme.com/product/PI-57768775/Surface-Laptop-7-Snapdragon-X-Elite-64GB-1TB-13.8inch
+- سرفیس لپ تاپ 7 مایکروسافت 15 اینچ Snapdragon X Elite 32GB-1TB | https://parsanme.com/product/PI-49944578/Surface-Laptop-7-Snapdragon-X-Elite-32GB-1TB-15inch
+- سرفیس لپ تاپ 6 مایکروسافت 15 اینچ Core Ultra 7-32GB-1TB | https://parsanme.com/product/PI-65364536/Microsoft-Surface-Laptop-6-15-inch-Core-Ultra-7-32GB-1TB
+- سرفیس لپ تاپ 7 مایکروسافت 13.8 اینچ Snapdragon X Elite 16GB-512GB | https://parsanme.com/product/PI-22996965/Surface-Laptop-7-Snapdragon-X-Elite-16GB-512GB-13.8inch
+- سرفیس لپ تاپ 7 مایکروسافت 15 اینچ Snapdragon X Elite 16GB-1TB | https://parsanme.com/product/PI-53694544/Surface-Laptop-7-Snapdragon-X-Elite-16GB-1TB-15inch
+- سرفیس لپ تاپ 7 مایکروسافت 13.8 اینچ Snapdragon X Plus 16GB-512GB | https://parsanme.com/product/PI-83218989/Surface-Laptop-7-Snapdragon-X-Plus-16GB-512GB-13.8inch
+- سرفیس لپ تاپ 6 مایکروسافت 13 اینچ Core Ultra 7-32GB-512GB | https://parsanme.com/product/PI-18136129/Microsoft-Surface-Laptop-6-13-inch-Core-Ultra-7-32GB-512GB
+- لپ تاپ گو 3 مایکروسافت 12 اینچ  Core i5 - 8GB - 256GB | https://parsanme.com/product/PI-13884988/Laptop-GO-3-Core-i5-8GB-256GB-12inch
+- سرفیس پرو ۱۲ اینچ Snapdragon X Plus 16GB-512GB | https://parsanme.com/product/PI-39769578/Surface-Pro-Snapdragon-X-Plus-16GB-512GB-12inch
+- سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Plus 16GB-512GB | https://parsanme.com/product/PI-39367178/Surface-Pro-11-Snapdragon-X-Plus-16GB-512GB-13inch
+- سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Plus 16GB-512GB+کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس | https://parsanme.com/product/PI-22557265/Surface-Pro-11-Snapdragon-X-Plus-16GB-512GB-13inch+Surface-Copilot-Pro-X-Keyboard
+- سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 16GB-512GB+کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس | https://parsanme.com/product/PI-27434997/Surface-Pro-11-Snapdragon-X-Elite-16GB-512GB-13inch+Surface-Copilot-Pro-X-Keyboard
+- سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 32GB-1TB | https://parsanme.com/product/PI-29455911/Surface-Pro-11-Snapdragon-X-Elite-32GB-1TB-13inch
+- سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 64GB-1TB | https://parsanme.com/product/PI-83896973/Surface-Pro-11-Snapdragon-X-Elite-64GB-1TB-13inch
+- سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 16GB-512GB | https://parsanme.com/product/PI-66883667/Surface-Pro-11-Snapdragon-X-Elite-16GB-512GB-13inch
+- سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 16GB-1TB+کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس | https://parsanme.com/product/PI-38462994/Surface-Pro-11-Snapdragon-X-Elite-16GB-1TB-13inch+Surface-Copilot-Pro-X-Keyboard
+- سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 16GB-1TB | https://parsanme.com/product/PI-35974192/Surface-Pro-11-Snapdragon-X-Elite-16GB-1TB-13inch
+- سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-64GB-1TB | https://parsanme.com/product/PI-79671387/Microsoft-Surface-Pro-10-13inch-Core-Ultra-7-64GB-1TB-WiFi
+- سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-512GB | https://parsanme.com/product/PI-34516529/Microsoft-Surface-Pro-10-13inch-Core-Ultra-7-16GB-512GB-WiFi
+- سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 5-8GB-256GB +کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس | https://parsanme.com/product/PI-51281965/Microsoft-Surface-Pro-10-13inch-Core-Ultra-5-8GB-256GB-WiFi+Surface-Copilot-Pro-X-Keyboard
+- سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-256GB | https://parsanme.com/product/PI-21978263/Microsoft-Surface-Pro-10-13inch-Core-Ultra-7-16GB-256GB-WiFi
+- سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 5-8GB-256GB | https://parsanme.com/product/PI-43789595/Microsoft-Surface-Pro-10-13inch-Core-Ultra-5-8GB-256GB-WiFi
+- سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-1TB | https://parsanme.com/product/PI-62596538/Microsoft-Surface-Pro-10-13inch-Core-Ultra-7-16GB-1TB-WiFi
+- سرفیس پرو 8 مایکروسافت 13 اینچ Core i7-16GB-1TB نسخه اسلیم باکس | https://parsanme.com/product/PI-99781128/Surface-Pro-8-Microsoft-13-inch-Core-i7-16GB-1TB-Slim-Box-version
+Processing row 1 for parsanme.com: Surface Pro 10, features: ['Ultra 7', '16GB', '512GB'], color: Platinum
+  [DEBUG] Product page colors: [('مشکی', 'black'), ('آبی', 'آبی')]
+  [DEBUG] Color does not match any product color. Not inserting product.
+Processing row 2 for parsanme.com: Surface Pro 10, features: ['Ultra 7', '32GB', '512GB'], color: Platinum
+    [DEBUG] No strong match for search terms: ['سرفیسپرو10', 'ultra7', '32gb', '512gb']
+    [DEBUG] Candidate product titles:
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-64GB-1TB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-512GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 5-8GB-256GB +کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Plus 16GB-512GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-256GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 5-8GB-256GB
+      - سرفیس پرو ۱۲ اینچ Snapdragon X Plus 16GB-512GB
+      - سرفیس پرو 8 مایکروسافت 13 اینچ Core i7-16GB-1TB نسخه اسلیم باکس
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 64GB - 2TB - RTX 4060
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 32GB - 1TB - RTX 4050
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 16GB - 512GB - RTX 2000
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 16GB - 512GB - RTX 4050
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 -16GB - 512GB - RTX 4060
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 64GB - 1TB - RTX 4060
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 16GB - 512GB - Intel  Xe
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 32GB - 1TB - RTX 2000
+      - سرفیس لپ تاپ 7 مایکروسافت 13.8 اینچ Snapdragon X Elite 64GB-1TB
+      - سرفیس لپ تاپ 7 مایکروسافت 15 اینچ Snapdragon X Elite 32GB-1TB
+      - سرفیس لپ تاپ 6 مایکروسافت 15 اینچ Core Ultra 7-32GB-1TB
+      - سرفیس لپ تاپ 7 مایکروسافت 13.8 اینچ Snapdragon X Elite 16GB-512GB
+      - سرفیس لپ تاپ 7 مایکروسافت 15 اینچ Snapdragon X Elite 16GB-1TB
+      - سرفیس لپ تاپ 7 مایکروسافت 13.8 اینچ Snapdragon X Plus 16GB-512GB
+      - سرفیس لپ تاپ 6 مایکروسافت 13 اینچ Core Ultra 7-32GB-512GB
+      - لپ تاپ گو 3 مایکروسافت 12 اینچ  Core i5 - 8GB - 256GB
+      - سرفیس پرو ۱۲ اینچ Snapdragon X Plus 16GB-512GB
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Plus 16GB-512GB
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Plus 16GB-512GB+کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 16GB-512GB+کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 32GB-1TB
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 64GB-1TB
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 16GB-512GB
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 16GB-1TB+کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 16GB-1TB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-64GB-1TB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-512GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 5-8GB-256GB +کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-256GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 5-8GB-256GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-1TB
+      - سرفیس پرو 8 مایکروسافت 13 اینچ Core i7-16GB-1TB نسخه اسلیم باکس
+  [DEBUG] No matching product found or no color specified.
+Processing row 3 for parsanme.com: Surface Pro 10, features: ['Ultra 7', '64GB', '1T'], color: Platinum
+  [DEBUG] Product page colors: [('مشکی', 'black'), ('آبی', 'آبی')]
+  [DEBUG] Color does not match any product color. Not inserting product.
+Processing row 4 for parsanme.com: Surface Pro 11, features: ['X Plus', '16GB', '256GB'], color: Black
+    [DEBUG] No strong match for search terms: ['سرفیسپرو11', 'xplus', '16gb', '256gb']
+    [DEBUG] Candidate product titles:
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-64GB-1TB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-512GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 5-8GB-256GB +کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Plus 16GB-512GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-256GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 5-8GB-256GB
+      - سرفیس پرو ۱۲ اینچ Snapdragon X Plus 16GB-512GB
+      - سرفیس پرو 8 مایکروسافت 13 اینچ Core i7-16GB-1TB نسخه اسلیم باکس
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 64GB - 2TB - RTX 4060
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 32GB - 1TB - RTX 4050
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 16GB - 512GB - RTX 2000
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 16GB - 512GB - RTX 4050
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 -16GB - 512GB - RTX 4060
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 64GB - 1TB - RTX 4060
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 16GB - 512GB - Intel  Xe
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 32GB - 1TB - RTX 2000
+      - سرفیس لپ تاپ 7 مایکروسافت 13.8 اینچ Snapdragon X Elite 64GB-1TB
+      - سرفیس لپ تاپ 7 مایکروسافت 15 اینچ Snapdragon X Elite 32GB-1TB
+      - سرفیس لپ تاپ 6 مایکروسافت 15 اینچ Core Ultra 7-32GB-1TB
+      - سرفیس لپ تاپ 7 مایکروسافت 13.8 اینچ Snapdragon X Elite 16GB-512GB
+      - سرفیس لپ تاپ 7 مایکروسافت 15 اینچ Snapdragon X Elite 16GB-1TB
+      - سرفیس لپ تاپ 7 مایکروسافت 13.8 اینچ Snapdragon X Plus 16GB-512GB
+      - سرفیس لپ تاپ 6 مایکروسافت 13 اینچ Core Ultra 7-32GB-512GB
+      - لپ تاپ گو 3 مایکروسافت 12 اینچ  Core i5 - 8GB - 256GB
+      - سرفیس پرو ۱۲ اینچ Snapdragon X Plus 16GB-512GB
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Plus 16GB-512GB
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Plus 16GB-512GB+کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 16GB-512GB+کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 32GB-1TB
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 64GB-1TB
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 16GB-512GB
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 16GB-1TB+کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 16GB-1TB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-64GB-1TB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-512GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 5-8GB-256GB +کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-256GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 5-8GB-256GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-1TB
+      - سرفیس پرو 8 مایکروسافت 13 اینچ Core i7-16GB-1TB نسخه اسلیم باکس
+  [DEBUG] No matching product found or no color specified.
+Processing row 5 for parsanme.com: Surface Pro 11, features: ['X Plus', '16GB', '256GB'], color: Platinum
+    [DEBUG] No strong match for search terms: ['سرفیسپرو11', 'xplus', '16gb', '256gb']
+    [DEBUG] Candidate product titles:
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-64GB-1TB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-512GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 5-8GB-256GB +کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Plus 16GB-512GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-256GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 5-8GB-256GB
+      - سرفیس پرو ۱۲ اینچ Snapdragon X Plus 16GB-512GB
+      - سرفیس پرو 8 مایکروسافت 13 اینچ Core i7-16GB-1TB نسخه اسلیم باکس
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 64GB - 2TB - RTX 4060
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 32GB - 1TB - RTX 4050
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 16GB - 512GB - RTX 2000
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 16GB - 512GB - RTX 4050
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 -16GB - 512GB - RTX 4060
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 64GB - 1TB - RTX 4060
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 16GB - 512GB - Intel  Xe
+      - لپ تاپ استودیو 2 مایکروسافت 14 اینچ Core i7 - 32GB - 1TB - RTX 2000
+      - سرفیس لپ تاپ 7 مایکروسافت 13.8 اینچ Snapdragon X Elite 64GB-1TB
+      - سرفیس لپ تاپ 7 مایکروسافت 15 اینچ Snapdragon X Elite 32GB-1TB
+      - سرفیس لپ تاپ 6 مایکروسافت 15 اینچ Core Ultra 7-32GB-1TB
+      - سرفیس لپ تاپ 7 مایکروسافت 13.8 اینچ Snapdragon X Elite 16GB-512GB
+      - سرفیس لپ تاپ 7 مایکروسافت 15 اینچ Snapdragon X Elite 16GB-1TB
+      - سرفیس لپ تاپ 7 مایکروسافت 13.8 اینچ Snapdragon X Plus 16GB-512GB
+      - سرفیس لپ تاپ 6 مایکروسافت 13 اینچ Core Ultra 7-32GB-512GB
+      - لپ تاپ گو 3 مایکروسافت 12 اینچ  Core i5 - 8GB - 256GB
+      - سرفیس پرو ۱۲ اینچ Snapdragon X Plus 16GB-512GB
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Plus 16GB-512GB
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Plus 16GB-512GB+کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 16GB-512GB+کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 32GB-1TB
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 64GB-1TB
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 16GB-512GB
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 16GB-1TB+کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس
+      - سرفیس پرو 11 مایکروسافت 13 اینچ Snapdragon X Elite 16GB-1TB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-64GB-1TB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-512GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 5-8GB-256GB +کیبورد سرفیس مدل کوپایلت سرفیس پرو ایکس
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-256GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 5-8GB-256GB
+      - سرفیس پرو 10 مایکروسافت 13 اینچ وای فای Core Ultra 7-16GB-1TB
+      - سرفیس پرو 8 مایکروسافت 13 اینچ Core i7-16GB-1TB نسخه اسلیم باکس
+  [DEBUG] No matching product found or no color specified.
+Processing row 6 for parsanme.com: Surface Pro 11, features: ['X Plus', '16GB', '512GB'], color: Black
+  [DEBUG] Product page colors: [('مشکی', 'black'), ('آبی', 'آبی')]
+  [DEBUG] Matched color: مشکی (black), URL: https://parsanme.com/product/PI-39367178/Surface-Pro-11-Snapdragon-X-Plus-16GB-512GB-13inch?variant[color]=black
+Processing row 7 for parsanme.com: Surface Pro 11, features: ['X Plus', '16GB', '512GB'], color: Platinum
+  [DEBUG] Product page colors: [('مشکی', 'black'), ('آبی', 'آبی')]
+  [DEBUG] Color does not match any product color. Not inserting product.
+Processing row 8 for parsanme.com: Surface Pro 11, features: ['X Elite', '16GB', '512GB'], color: Black
+  [DEBUG] Product page colors: [('مشکی', 'black'), ('آبی', 'آبی')]
+  [DEBUG] Matched color: مشکی (black), URL: https://parsanme.com/product/PI-27434997/Surface-Pro-11-Snapdragon-X-Elite-16GB-512GB-13inch+Surface-Copilot-Pro-X-Keyboard?variant[color]=black
+Processing row 9 for parsanme.com: Surface Pro 11, features: ['X Elite', '16GB', '512GB'], color: Platinum
+  [DEBUG] Product page colors: [('مشکی', 'black'), ('آبی', 'آبی')]
+  [DEBUG] Color does not match any product color. Not inserting product.
+Done. Prices and product URLs updated in SampleSites.xlsx.

@@ -8,7 +8,7 @@ from selenium import webdriver
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.common.by import By
 
-#fully functioningggggggg 
+#solved
 def search_yasinrayan_url(product_name, features):
     search_query = product_name + ' ' + ' '.join(str(f) for f in features if f)
     search_url = f'https://www.yasinrayan.com/?s={urllib.parse.quote(search_query)}&post_type=product'
@@ -45,23 +45,40 @@ def search_yasinrayan_url(product_name, features):
 def normalize(text):
     return re.sub(r'[^a-zA-Z0-9آ-ی]', '', str(text).lower())
 
-def best_match(product_name, features, products, min_match=2):
+def persian_to_english_digits(persian_string):
+    """Converts a string with Persian digits to English digits."""
+    persian_to_english_map = {
+        '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4',
+        '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9'
+    }
+    # Also handle Arabic digits if they appear
+    persian_to_english_map.update({
+        '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
+        '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9'
+    })
+    # Remove non-digit characters like commas
+    persian_string = re.sub(r'[,]', '', persian_string)
+    translation_table = str.maketrans(persian_to_english_map)
+    return persian_string.translate(translation_table)
+
+def get_strong_matches(product_name, features, products):
+    """Finds all products that fully match the search terms (product name + features)."""
     search_terms = [normalize(product_name)] + [normalize(f) for f in features if f]
-    best = None
-    best_score = 0
+    full_matches = []
     for prod in products:
         title = normalize(prod['title'])
-        score = sum(term in title for term in search_terms)
-        if score > best_score:
-            best = prod
-            best_score = score
-    if best_score < min_match:
-        print(f"    [DEBUG] No strong match for search terms: {search_terms}")
+        # Check if all search terms are in the title
+        if all(term in title for term in search_terms):
+            full_matches.append(prod)
+
+    if not full_matches:
+        print(f"    [DEBUG] No full matches found for search terms: {search_terms}")
         print("    [DEBUG] Candidate product titles:")
         for prod in products:
             print(f"      - {prod['title']}")
-        return None
-    return best
+        return []
+
+    return full_matches
 
 def get_available_colors(product_url):
     headers = {
@@ -127,6 +144,17 @@ def map_color_name(color):
             return fa
     return color  # fallback to original
 
+def map_product_name(name):
+    """Translates English product names to Persian for better matching."""
+    name_map = {
+        'surface pro 10': 'سرفیس پرو 10',
+        'surface pro 11': 'سرفیس پرو 11',
+        'surface laptop 6': 'سرفیس لپ تاپ 6',
+    }
+    # Normalize the input name for a case-insensitive lookup
+    name_lower = str(name).lower().strip()
+    return name_map.get(name_lower, name)
+
 # --- Main script ---
 
 df = pd.read_excel('SampleSites.xlsx')
@@ -142,28 +170,47 @@ for idx, row in df.iterrows():
     product_name = row['Product name']
     features = [row['Cpu'], row['Ram'], row['SSD']]
     desired_color = str(row['Color']).strip()
+    
+    # Map product name and color to Persian
+    product_name_mapped = map_product_name(product_name)
     desired_color_mapped = map_color_name(desired_color)
-    print(f"Processing row {idx+1} for yasinrayan.com: {product_name}, features: {features}, color: {desired_color} (mapped: {desired_color_mapped})")
+
+    print(f"Processing row {idx+1} for yasinrayan.com: {product_name} (mapped: {product_name_mapped}), features: {features}, color: {desired_color} (mapped: {desired_color_mapped})")
+    
+    # Use the original English name for the URL search query, as it's more likely to work with the site's search engine
     products = search_yasinrayan_url(product_name, features)
-    match = best_match(product_name, features, products)
-    if match:
-        available_colors = get_available_colors_selenium(match['url'])
-        print(f"  [DEBUG] Available colors: {available_colors}")
-        # Only match enabled colors
-        if any(normalize(desired_color_mapped) == normalize(c[0]) and c[1] for c in available_colors):
-            print(f"  [DEBUG] Color match found and enabled: {desired_color_mapped}")
-            price = match['cat_price']
-            price = price.replace('تومان', '').strip()
-            price = persian_to_english_digits(price)
-            df.at[idx, 'yasinrayanproducturl'] = match['url']
-        else:
-            print(f"  [DEBUG] Desired color '{desired_color}' (mapped: '{desired_color_mapped}') not found or disabled.")
-            price = ''
-            df.at[idx, 'yasinrayanproducturl'] = ''
+    # But use the mapped Persian name for title matching
+    strong_matches = get_strong_matches(product_name_mapped, features, products)
+
+    price = ''
+    product_url = ''
+    found_match_with_color = False
+
+    if strong_matches:
+        print(f"  [DEBUG] Found {len(strong_matches)} strong match(es). Checking for color availability...")
+        for i, match in enumerate(strong_matches):
+            print(f"    [DEBUG] Checking match {i+1}/{len(strong_matches)}: {match['title']}")
+            available_colors = get_available_colors_selenium(match['url'])
+            print(f"      [DEBUG] Available colors: {available_colors}")
+            
+            # Check if the desired color is present and enabled
+            if any(normalize(desired_color_mapped) == normalize(c[0]) and c[1] for c in available_colors):
+                print(f"      [DEBUG] Color match found and enabled: {desired_color_mapped}")
+                price = match['cat_price']
+                price = price.replace('تومان', '').strip()
+                price = persian_to_english_digits(price)
+                product_url = match['url']
+                found_match_with_color = True
+                break  # Stop after finding the first product with the right color
+            else:
+                print(f"      [DEBUG] Desired color '{desired_color_mapped}' not found or is disabled for this product.")
+        
+        if not found_match_with_color:
+            print(f"  [DEBUG] Checked all {len(strong_matches)} strong matches, but none had the desired color '{desired_color_mapped}' available.")
     else:
         print("  [DEBUG] No matching product found.")
-        price = ''
-        df.at[idx, 'yasinrayanproducturl'] = ''
+
+    df.at[idx, 'yasinrayanproducturl'] = product_url
     print(f"  -> Price found: {price}")
     df.at[idx, 'yasinrayan.com'] = price
     time.sleep(1)
