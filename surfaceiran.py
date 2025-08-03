@@ -1,10 +1,25 @@
 import pandas as pd
 import requests
-from bs4 import BeautifulSoup
+from urllib.parse import quote
 import time
 import re
+
+# Color mapping from English to Persian
+COLOR_MAP = {
+    'platinum': 'پلاتینی',
+    'graphite': 'نوک مدادی',
+    'black': 'مشکی',
+    'silver': 'نقره ای',
+    'sandstone': 'سنگ شنی',
+    'ice blue': 'آبی یخی',
+    'poppy red': 'قرمز',
+    'sapphire': 'یاقوتی',
+    'forest': 'جنگلی',
+    'dune': 'طلایی'
+}
+
 #solved
-#surfaceiran.com does not have surface 11 available
+
 def normalize(text):
     # Replace Persian 'گیگابایت' with 'gb'
     text = str(text).replace('گیگابایت', 'gb')
@@ -25,40 +40,61 @@ def best_match(product_name, features, products):
     # print("    [DEBUG] Candidate product titles:")
     # for prod in products:
         # print(f"      - {prod['name']}")
-    #return None
+    return None
 
-def scrape_all_products_from_url(url):
+def scrape_all_products_from_api(base_api_url, pid):
     headers = {
-        "User-Agent": "Mozilla/5.0 (compatible; SurfaceIranScraper/1.0)"
+        "User-Agent": "Mozilla/5.0 (compatible; SurfaceIranScraper/2.0)"
     }
-    try:
-        resp = requests.get(url, headers=headers, timeout=20)
-        resp.raise_for_status()
-        soup = BeautifulSoup(resp.text, 'html.parser')
-        products = []
-        for prod_div in soup.find_all('div', class_='productItem'):
-            name_tag = prod_div.find('div', class_='productname')
-            name = name_tag.get_text(strip=True) if name_tag else ''
-            price_tag = prod_div.find('span', class_='price')
-            price_text = price_tag.get_text(strip=True) if price_tag else ''
-            price = re.sub(r'[^\d]', '', price_text) if price_text else ''
-            a_tag = prod_div.find('a', href=True)
-            url_path = a_tag['href'] if a_tag else ''
-            if url_path and not url_path.startswith('http'):
-                url_full = 'https://surfaceiran.com' + url_path
-            else:
-                url_full = url_path
-            products.append({'name': name, 'price': price, 'url': url_full})
-        return products
-    except Exception as e:
-        # print(f"[DEBUG] Error scraping products from url: {e}")
-        return []
+    all_products = []
+    
+    # Scrape from offset 0 to 3
+    for offset in range(0, 4):
+        paginated_url = f"{base_api_url}?limit=12&offset={offset}&pid={pid}"
+        #print(f"Scraping API page: {paginated_url}")
+        try:
+            resp = requests.get(paginated_url, headers=headers, timeout=20)
+            resp.raise_for_status()
+            data = resp.json()
+            
+            products_on_page = data.get('rows', [])
+            if not products_on_page:
+                print(f"No more products found at offset {offset}. Stopping.")
+                break
+
+            for prod_data in products_on_page:
+                base_name = prod_data.get('productname', '')
+                prod_id = prod_data.get('_id')
+                price_list = prod_data.get('price', [])
+
+                if not price_list:
+                    continue
+
+                for price_variant in price_list:
+                    variant_info = price_variant.get('priceinfo', '')
+                    price = price_variant.get('price', '')
+                    
+                    # Combine base name with variant info for a unique, searchable name
+                    full_name = f"{base_name} {variant_info}"
+                    
+                    # Construct URL
+                    url_full = f"https://surfaceiran.com/p/{prod_id}/{quote(base_name)}" if prod_id and base_name else ''
+                    
+                    all_products.append({'name': full_name, 'price': str(price), 'url': url_full})
+
+            time.sleep(1) # Be polite to the server
+
+        except requests.exceptions.RequestException as e:
+            print(f"[DEBUG] Error scraping API at offset {offset}: {e}")
+            continue # Continue to the next offset
+            
+    return all_products
 
 # --- Main script ---
 
-CATEGORY_URL = 'https://surfaceiran.com/products/65e24e454b49f2d824666a29/%D8%B3%D8%B1%D9%81%DB%8C%D8%B3-%D9%BE%D8%B1%D9%88'
-
-all_products = scrape_all_products_from_url(CATEGORY_URL)
+API_BASE_URL = 'https://surfaceiran.com/products/getList'
+PRODUCT_GROUP_ID = '65e24e454b49f2d824666a29'
+all_products = scrape_all_products_from_api(API_BASE_URL, PRODUCT_GROUP_ID)
 
 # print("[ALL SCRAPED PRODUCTS]")
 # for prod in all_products:
@@ -79,7 +115,12 @@ df['surfaceiranproducturl'] = df['surfaceiranproducturl'].astype('object')
 
 for idx, row in df.iterrows():
     product_name = row['Product name']
-    features = [row['Cpu'], row['Ram'], row['SSD']]
+    color_en = row.get('Color')
+    color_fa = None
+    if isinstance(color_en, str):
+        color_fa = COLOR_MAP.get(color_en.lower())
+
+    features = [row['Cpu'], row['Ram'], row['SSD'], color_fa]
     # print(f"Processing row {idx+1} for surfaceiran.com: {product_name}, features: {features}")
     match = best_match(product_name, features, all_products)
     if match:

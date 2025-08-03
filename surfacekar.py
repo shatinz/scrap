@@ -1,4 +1,3 @@
-
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -8,8 +7,16 @@ import re
 #solves
 # can not switch between colors
 
+def translate_to_persian(product_name):
+    if "Surface Pro 11" in product_name:
+        return product_name.replace("Surface Pro 11", "سرفیس پرو 11")
+    if "Surface Pro 10" in product_name:
+        return product_name.replace("Surface Pro 10", "سرفیس پرو 10")
+    return product_name
+
 def search_surfacekar_url(product_name, features, color):
-    search_query = product_name + ' ' + ' '.join(str(f) for f in features if f)
+    product_name = translate_to_persian(product_name)
+    search_query = product_name
     search_url = f'https://surfacekar.com/?s={urllib.parse.quote(search_query)}&post_type=product'
     # print(f"[DEBUG] surfacekar.com search URL: {search_url}")
     headers = {
@@ -56,12 +63,16 @@ def normalize(text):
     text = text.replace('پلاتینیوم', 'platinum')
     text = text.replace('مشکی', 'black')
     text = text.replace('graphite', 'black')
-    return re.sub(r'[^a-zA-Z0-9]', '', text)
+    return re.sub(r'[^a-zA-Z0-9\u0600-\u06FF]', '', text)
 
 def best_match(product_name, features, color, products):
-    search_terms = [normalize(product_name)] + [normalize(f) for f in features if f]
+    persian_product_name = translate_to_persian(product_name)
+    search_terms_eng = [normalize(product_name)] + [normalize(f) for f in features if f] + ['ssd']
+    search_terms_persian = [normalize(persian_product_name)] + [normalize(f) for f in features if f] + ['ssd']
+    
     normalized_color = normalize(color) if color else None
-    # print(f"    [DEBUG] Normalized search terms for full match: {search_terms}")
+    # print(f"    [DEBUG] Normalized search terms for full match (ENG): {search_terms_eng}")
+    # print(f"    [DEBUG] Normalized search terms for full match (PER): {search_terms_persian}")
     if normalized_color:
         # print(f"    [DEBUG] Normalized color for match: {normalized_color}")
         pass
@@ -71,12 +82,13 @@ def best_match(product_name, features, color, products):
         # print(f"    [DEBUG] Normalized product title: {title}")
         
         # Check for feature match
-        feature_match = all(term in title for term in search_terms)
+        feature_match_eng = all(term in title for term in search_terms_eng)
+        feature_match_persian = all(term in title for term in search_terms_persian)
         
         # Check for color match
         color_match = (normalized_color is None) or (normalized_color in prod['colors'])
         
-        if feature_match and color_match:
+        if (feature_match_eng or feature_match_persian) and color_match:
             # print(f"    [DEBUG] FULL MATCH FOUND (Features & Color): {prod['title']}")
             return prod
             
@@ -107,7 +119,7 @@ df['surfacekarproducturl'] = df['surfacekarproducturl'].astype('object')
 for idx, row in df.iterrows():
     product_name = row['Product name']
     color = row.get('Color') 
-    features = [row['Cpu'], row['Ram'], 'SSD']
+    features = [row['Cpu'], row['Ram'], row['SSD']]
     # print(f"Processing row {idx+1} for surfacekar.com: {product_name}, features: {features}, color: {color}")
     products = search_surfacekar_url(product_name, features, color)
     match = best_match(product_name, features, color, products)

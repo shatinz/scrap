@@ -88,7 +88,8 @@ def decode_and_normalize_color(color):
         'پلاتینی': 'platinum',
         'گرافیت': 'graphite',
         'نقره-ای': 'silver',
-        'دون-گلد': 'platinum'
+        'دون-گلد': 'platinum',
+        'آبی' : 'blue'
     }
     
     return color_map.get(decoded_color, decoded_color)
