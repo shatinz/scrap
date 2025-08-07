@@ -14,9 +14,7 @@ def translate_to_persian(product_name):
         return product_name.replace("Surface Pro 10", "سرفیس پرو 10")
     return product_name
 
-def search_surfacekar_url(product_name, features, color):
-    product_name = translate_to_persian(product_name)
-    search_query = product_name
+def execute_search(search_query):
     search_url = f'https://surfacekar.com/?s={urllib.parse.quote(search_query)}&post_type=product'
     # print(f"[DEBUG] surfacekar.com search URL: {search_url}")
     headers = {
@@ -86,7 +84,7 @@ def best_match(product_name, features, color, products):
         feature_match_persian = all(term in title for term in search_terms_persian)
         
         # Check for color match
-        color_match = (normalized_color is None) or (normalized_color in prod['colors'])
+        color_match = (normalized_color is None) or any(normalized_color in c for c in prod['colors'])
         
         if (feature_match_eng or feature_match_persian) and color_match:
             # print(f"    [DEBUG] FULL MATCH FOUND (Features & Color): {prod['title']}")
@@ -94,8 +92,9 @@ def best_match(product_name, features, color, products):
             
     # print(f"    [DEBUG] No full match found for search terms and color.")
     # print("    [DEBUG] Candidate product titles:")
-    # for prod in products:
+    for prod in products:
         # print(f"      - {prod['title']} (Colors: {prod['colors']})")
+        pass
     return None
 
 def persian_to_english_digits(text):
@@ -121,8 +120,29 @@ for idx, row in df.iterrows():
     color = row.get('Color') 
     features = [row['Cpu'], row['Ram'], row['SSD']]
     # print(f"Processing row {idx+1} for surfacekar.com: {product_name}, features: {features}, color: {color}")
-    products = search_surfacekar_url(product_name, features, color)
-    match = best_match(product_name, features, color, products)
+
+    persian_name_space = translate_to_persian(product_name)
+    persian_name_no_space = re.sub(r'(\S)\s+(\d+)', r'\1\2', persian_name_space)
+
+    # Create a unique list of search queries
+    search_queries = list(dict.fromkeys([
+        product_name,
+        persian_name_space,
+        persian_name_no_space
+    ]))
+    
+    all_products = []
+    processed_urls = set()
+
+    for query in search_queries:
+        products = execute_search(query)
+        for product in products:
+            if product['url'] not in processed_urls:
+                all_products.append(product)
+                processed_urls.add(product['url'])
+        time.sleep(0.5) # Small delay between searches
+
+    match = best_match(product_name, features, color, all_products)
     if match:
         # print(f"  [DEBUG] Matched product: {match['title']} ({match['url']})")
         price = match['cat_price']
@@ -134,7 +154,7 @@ for idx, row in df.iterrows():
         df.at[idx, 'surfacekarproducturl'] = ''
     # print(f"  -> Price found: {price}")
     df.at[idx, 'surfacekar.com'] = price
-    time.sleep(1)
+    time.sleep(0.5)
 
 df.to_excel('SampleSites.xlsx', index=False)
 # print('Done. Prices and product URLs updated in SampleSites.xlsx.')
