@@ -8,8 +8,6 @@ import re
 CATEGORY_URLS = [
     "https://parsanme.com/store/microsoft-surface",
     "https://parsanme.com/store/surface-pro"
-    "https://parsanme.com/store/surface-pro-11"
-    "https://parsanme.com/store/surface-pro-10"
 ]
 
 # English to Persian product names
@@ -27,7 +25,7 @@ EN_TO_FA_PRODUCT = {
 EN_TO_FA_COLOR = {
     "platinum": "پلاتینیوم",
     "black": "مشکی",
-    "purple": "بنفش",
+    "purple": "بنفسی",
     "ocean": "اقیانوسی",
     "silver": "نقره ای",
     # Add more mappings as needed
@@ -41,13 +39,13 @@ def get_all_products_from_category(category_url):
     }
     while True:
         url = category_url if page == 1 else f"{category_url}?page={page}"
-        # print(f"[DEBUG] Scraping: {url}")
+        print(f"[DEBUG] Scraping: {url}")
         try:
             resp = requests.get(url, timeout=20, headers=headers)
             soup = BeautifulSoup(resp.text, 'html.parser')
             product_links = soup.select('a.title.ellipsis-2')
             if not product_links:
-                # print(f"[DEBUG] No product links found on {url}")
+                print(f"[DEBUG] No product links found on {url}")
                 break
             for a in product_links:
                 title = a.get('title', '').strip() or a.text.strip()
@@ -64,7 +62,7 @@ def get_all_products_from_category(category_url):
                 if title and href:
                     products.append({'title': title, 'url': href, 'cat_price': price})
         except Exception as e:
-            # print(f"[DEBUG] Error scraping {url}: {e}")
+            print(f"[DEBUG] Error scraping {url}: {e}")
             pass
             break
         # Pagination: check for next page (adjust if needed)
@@ -94,16 +92,20 @@ def get_product_colors_and_variants(url):
                         color_list.append((persian_color, color_key))
         return color_list
     except Exception as e:
-        # print(f"[DEBUG] Error fetching colors from {url}: {e}")
+        print(f"[DEBUG] Error fetching colors from {url}: {e}")
         pass
     return []
 
 def normalize(text):
-    return re.sub(r'[^a-zA-Z0-9آ-ی]', '', str(text).lower())
+    # Convert to string and handle NaN
+    text = str(text) if pd.notna(text) else ""
+    return re.sub(r'[^a-zA-Z0-9آ-ی]', '', text.lower())
 
 def get_persian_product_name(english_name):
-    key = english_name.strip().lower()
-    return EN_TO_FA_PRODUCT.get(key, english_name)
+    # Convert to string and handle NaN before stripping and lowering
+    english_name_str = str(english_name) if pd.notna(english_name) else ""
+    key = english_name_str.strip().lower()
+    return EN_TO_FA_PRODUCT.get(key, english_name_str)
 
 def get_persian_color_name(english_color):
     key = english_color.strip().lower()
@@ -126,25 +128,15 @@ def normalize_color(text):
 def best_match(product_name, features, products):
     # Use Persian name if available
     persian_name = get_persian_product_name(product_name)
-    feature_terms = [normalize(f) for f in features if f]
-    
-    english_term = normalize(product_name)
-    persian_term = normalize(persian_name)
-
+    search_terms = [normalize(persian_name)] + [normalize(f) for f in features if pd.notna(f)] # Added pd.notna check for features
     for prod in products:
         title = normalize(prod['title'])
-        
-        name_in_title = english_term in title or persian_term in title
-        features_in_title = all(term in title for term in feature_terms)
-
-        if name_in_title and features_in_title:
+        if all(term in title for term in search_terms):
             return prod
-
-    search_terms = [persian_term] + feature_terms
-    # print(f"    [DEBUG] No strong match for search terms: {search_terms}")
-    # print("    [DEBUG] Candidate product titles:")
-    # for prod in products:
-        # print(f"      - {prod['title']}")
+    print(f"    [DEBUG] No strong match for search terms: {search_terms}")
+    print("    [DEBUG] Candidate product titles:")
+    for prod in products:
+        print(f"      - {prod['title']}")
     return None
 
 # --- Main script ---
@@ -162,45 +154,51 @@ all_products = []
 for category_url in CATEGORY_URLS:
     all_products.extend(get_all_products_from_category(category_url))
 
-# print("\n[ALL SCRAPED PRODUCTS]")
-# for prod in all_products:
-    # print(f"- {prod['title']} | {prod['url']}")
+print("\n[ALL SCRAPED PRODUCTS]")
+for prod in all_products:
+    print(f"- {prod['title']} | {prod['url']}")
 
 for idx, row in df.iterrows():
-    product_name = str(row['Product name'])
+    product_name = row['Product name']
     features = [row['Cpu'], row['Ram'], row['SSD']]
     color = str(row['Color']).strip() if 'Color' in row and pd.notna(row['Color']) else ''
-    # print(f"Processing row {idx+1} for parsanme.com: {product_name}, features: {features}, color: {color}")
-    match = best_match(product_name, features, all_products)
-    if match and color:
-        product_colors = get_product_colors_and_variants(match['url'])
-        # print(f"  [DEBUG] Product page colors: {product_colors}")
-        color_norm = normalize_color(color)
-        found = False
-        for persian_color, color_key in product_colors:
-            persian_norm = normalize_color(persian_color)
-            if color_norm == persian_norm:
-                # Build variant URL
-                variant_url = match['url']
-                if '?' in variant_url:
-                    variant_url += f"&variant[color]={color_key}"
-                else:
-                    variant_url += f"?variant[color]={color_key}"
-                # print(f"  [DEBUG] Matched color: {persian_color} ({color_key}), URL: {variant_url}")
-                price = match['cat_price']
-                df.at[idx, 'parsanmeproducturl'] = variant_url
-                df.at[idx, 'parsanme.com'] = price
-                found = True
-                break
-        if not found:
-            # print("  [DEBUG] Color does not match any product color. Not inserting product.")
+    print(f"Processing row {idx+1} for parsanme.com: {product_name}, features: {features}, color: {color}")
+    # Added check for pd.notna(product_name) before calling best_match
+    if pd.notna(product_name):
+        match = best_match(product_name, features, all_products)
+        if match and color:
+            product_colors = get_product_colors_and_variants(match['url'])
+            print(f"  [DEBUG] Product page colors: {product_colors}")
+            color_norm = normalize_color(color)
+            found = False
+            for persian_color, color_key in product_colors:
+                persian_norm = normalize_color(persian_color)
+                if color_norm == persian_norm:
+                    # Build variant URL
+                    variant_url = match['url']
+                    if '?' in variant_url:
+                        variant_url += f"&variant[color]={color_key}"
+                    else:
+                        variant_url += f"?variant[color]={color_key}"
+                    print(f"  [DEBUG] Matched color: {persian_color} ({color_key}), URL: {variant_url}")
+                    price = match['cat_price']
+                    df.at[idx, 'parsanmeproducturl'] = variant_url
+                    df.at[idx, 'parsanme.com'] = price
+                    found = True
+                    break
+            if not found:
+                print("  [DEBUG] Color does not match any product color. Not inserting product.")
+                df.at[idx, 'parsanmeproducturl'] = ''
+                df.at[idx, 'parsanme.com'] = ''
+        else:
+            print("  [DEBUG] No matching product found or no color specified.")
             df.at[idx, 'parsanmeproducturl'] = ''
             df.at[idx, 'parsanme.com'] = ''
     else:
-        # print("  [DEBUG] No matching product found or no color specified.")
+        print("  [DEBUG] Product name is NaN. Skipping row.")
         df.at[idx, 'parsanmeproducturl'] = ''
         df.at[idx, 'parsanme.com'] = ''
-    time.sleep(1)
+
 
 df.to_excel('SampleSites.xlsx', index=False)
-# print('Done. Prices and product URLs updated in SampleSites.xlsx.')
+print('Done. Prices and product URLs updated in SampleSites.xlsx.')
