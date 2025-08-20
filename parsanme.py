@@ -7,8 +7,8 @@ import re
 
 CATEGORY_URLS = [
     "https://parsanme.com/store/microsoft-surface",
-    "https://parsanme.com/store/surface-pro"
-    "https://parsanme.com/store/surface-pro-11"
+    "https://parsanme.com/store/surface-pro",
+    "https://parsanme.com/store/surface-pro-11",
     "https://parsanme.com/store/surface-pro-10"
 ]
 
@@ -158,9 +158,12 @@ if 'parsanmeproducturl' not in df.columns:
     df.insert(idx, 'parsanmeproducturl', '')
 df['parsanmeproducturl'] = df['parsanmeproducturl'].astype('object')
 
-all_products = []
+all_products_dict = {}
 for category_url in CATEGORY_URLS:
-    all_products.extend(get_all_products_from_category(category_url))
+    for prod in get_all_products_from_category(category_url):
+        if prod.get('url') and prod['url'] not in all_products_dict:
+            all_products_dict[prod['url']] = prod
+all_products = list(all_products_dict.values())
 
 print("\n[ALL SCRAPED PRODUCTS]")
 for prod in all_products:
@@ -168,7 +171,7 @@ for prod in all_products:
 
 for idx, row in df.iterrows():
     product_name = str(row['Product name'])
-    features = [row['Cpu'], row['Ram'], 'SSD']
+    features = [row['Cpu'], row['Ram'], row.get('SSD')]
     color = str(row['Color']).strip() if 'Color' in row and pd.notna(row['Color']) else ''
     print(f"Processing row {idx+1} for parsanme.com: {product_name}, features: {features}, color: {color}")
     match = best_match(product_name, features, all_products)
